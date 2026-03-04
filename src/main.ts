@@ -26,18 +26,31 @@ const KB = {
   },
 
   products: {
-    "books / bill books": "Custom-designed bill books with sequential numbering, carbon copy options, and sturdy binding — perfect for organized and professional business transactions.",
-    "brochures": "High-impact brochures printed with vibrant colors and sharp details. Folded, stitched, or stapled — we deliver marketing materials that leave a lasting impression.",
-    "calendars": "High-quality custom calendar printing to showcase your brand all year round. Vibrant designs and premium materials — perfect for businesses, events, and gifts.",
-    "certificates": "Professional certificate printing with elegant designs and premium finishes. Ideal for awards, achievements, and recognitions.",
-    "envelopes": "Custom envelope printing with sharp designs and quality materials — perfect for businesses, events, and personal branding.",
-    "invitations": "Elegant and customized invitation printing for weddings, events, and special occasions. Premium designs and flawless finishes.",
-    "letterheads": "Professional letterhead printing with premium quality paper and crisp designs — perfect for enhancing your brand identity.",
-    "logo printing": "High-quality logo printing that brings your brand to life with vibrant colors and sharp details.",
-    "shields / trophies": "Premium shield printing for awards, honors, and special recognitions — crafted with precision and elegant finishes.",
-    "standees": "Eye-catching standee printing for events, promotions, and branding — vibrant colors and durable materials.",
-    "stickers": "Custom sticker printing with vibrant colors, strong adhesives, and premium finishes — perfect for branding and packaging.",
-    "business cards": "Premium business card printing with sleek designs and high-quality materials — leaving a professional lasting impression.",
+    "sun pack printing": `Professional <strong>Sun Pack Printing</strong> solutions (All-inclusive price).<br><br>� <strong>Price per piece (Multi-Colour):</strong><br>• 1x1: ₹15 (300) | ₹14 (500) | ₹12 (1000) | ₹11 (2000)<br>• 1x1.5: ₹22.5 (300) | ₹21 (500) | ₹18 (1000) | ₹16.5 (2000)<br>• 2x1.5: ₹45 (300) | ₹42 (500) | ₹36 (1000) | ₹33 (2000)<br>• 2x2: ₹60 (300) | ₹56 (500) | ₹48 (1000) | ₹44 (2000)<br>• 3x2: ₹90 (300) | ₹84 (500) | ₹72 (1000) | ₹66 (2000)<br><br>🎨 <strong>Design Charges:</strong> ₹500`,
+    "flex": `Premium <strong>Flex Printing</strong> & Media Solutions.<br><br>📋 <strong>Media Rates (per sq.ft):</strong><br>• Normal Flex: ₹12 (Above 100 sq.ft)<br>• Black Media: ₹20<br>• Star Flex: ₹25<br>• Backlit / Vinyl: ₹25<br>• Sun Pack: ₹15<br><br>📐 <strong>Piece Rates:</strong><br>• 3x2: ₹350 | 4x3: ₹450<br>• 5x3: ₹500 | 6x3: ₹600<br>• 8x3: ₹650 | 8x4: ₹750<br>• 8x6: ₹900 | 10x5: ₹950<br>• 10x6: ₹1000 | 10x10: ₹1150<br><br>🎨 <strong>Design Charges:</strong> ₹350`,
+    "id cards": `Professional <strong>PVC ID Cards</strong> & Accessories.<br><br>📋 <strong>Pricing:</strong><br>• Pvc id card: ₹50<br>• Holder: ₹10<br>• Normal rope (no print): ₹10<br>• Multi-color rope (fish hook): ₹30<br><br>🎨 <strong>Design Charges:</strong><br>• Qty < 10 nos: ₹150 (total)<br>• Qty > 10 nos: ₹15 per card`,
+    "multi colour certificate": `Professional <strong>Multi-Colour Certificates</strong> (A4 Size).<br><br>📋 <strong>300 Gsm Art Board (Single Side):</strong><br>• 1 - 20 nos: ₹12 per cert<br>• 20 - 250 nos: ₹10 per cert<br>• 300+ nos: ₹07 per cert<br><br>📄 <strong>Special Boards:</strong><br>• Textured Board: ₹20 per cert<br>• Metallic Board: ₹25 per cert<br><br>🎨 <strong>Design Charges:</strong> ₹300`,
+    "flyer a5 ss": `<strong>Flyer A5 (Single Side)</strong> - 21.5 x 14.5 cm.<br><br>📋 <strong>100 GSM Paper:</strong><br>• 1000 Nos: ₹2850<br>• 5000 Nos: ₹4250<br>• 10000 Nos: ₹6500<br><br>🎨 <strong>Design Cost:</strong> ₹300`,
+    "flyer a5 fb": `<strong>Flyer A5 (Front & Back)</strong> - 21.5 x 14.5 cm.<br><br>📋 <strong>100 GSM Paper:</strong><br>• 1000 Nos: ₹2850<br>• 5000 Nos: ₹4750<br>• 10000 Nos: ₹7000<br><br>🎨 <strong>Design Cost:</strong> ₹700`,
+    "flyer a4 ss": `<strong>Flyer A4 (Single Side)</strong> - 21.5 x 28.5 cm.<br><br>📋 <strong>100 GSM Paper:</strong><br>• 1000 Nos: ₹3200<br>• 5000 Nos: ₹6500<br>• 10000 Nos: ₹10500<br><br>🎨 <strong>Design Cost:</strong> ₹500`,
+    "flyer a4 fb": `<strong>Flyer A4 (Front & Back)</strong> - 21.5 x 28.5 cm.<br><br>📋 <strong>100 GSM Paper:</strong><br>• 1000 Nos: ₹3000<br>• 5000 Nos: ₹7000<br>• 10000 Nos: ₹11500<br><br>🎨 <strong>Design Cost:</strong> ₹800`,
+    "flyer a3 ss": `<strong>Flyer A3 (Single Side)</strong> - 42 x 21 cm.<br><br>📋 <strong>100 GSM Paper:</strong><br>• 1000 Nos: ₹3900<br>• 5000 Nos: ₹10500<br>• 10000 Nos: ₹18500`,
+    "flyer a3 fb": `<strong>Flyer A3 (Front & Back)</strong> - 42 x 21 cm.<br><br>📋 <strong>100 GSM Paper:</strong><br>• 1000 Nos: ₹3900<br>• 5000 Nos: ₹11500<br>• 10000 Nos: ₹21000`,
+    "multi colour envelopes": `Professional <strong>Multi-Colour Envelopes</strong> (10.5 x 4.5 inch).<br><br>📋 <strong>80 Gsm Bond Sheet:</strong><br>• 1000 Nos: ₹5000<br><br>🎨 <strong>Design Charges:</strong> ₹300`,
+    "double colour envelopes": `Professional <strong>Double-Colour Envelopes</strong> (10.5 x 4.5 inch).<br><br>📋 <strong>80 Gsm Bond Sheet:</strong><br>• 1000 Nos: ₹2100<br><br>🎨 <strong>Design Charges:</strong> ₹200`,
+    "single colour envelopes": `Professional <strong>Single-Colour Envelopes</strong> (10.5 x 4.5 inch).<br><br>📋 <strong>80 Gsm Bond Sheet:</strong><br>• 1000 Nos: ₹1800<br><br>🎨 <strong>Design Charges:</strong> ₹150`,
+    "synopsis binding": `Professional <strong>Synopsis Binding (Tape)</strong>.<br><br>📋 <strong>Pricing:</strong><br>• Less than 50 Pages: ₹50<br>• 50 - 200 Pages: ₹100<br>• More than 200 Pages: ₹200<br><br>🎨 <strong>Extras:</strong><br>• For Color Board: ₹15 extra`,
+    "multi colour letter head": `Professional <strong>Multi-Colour Letterheads</strong> (A4 - 210 x 297 mm).<br><br>📋 <strong>80 Gsm Bond Sheet (Single Side):</strong><br>• 500 Nos (Loose): ₹2800<br>• 1000 Nos (Loose): ₹3500<br>• 5 Pads (Finishing): ₹2950<br>• 10 Pads (Finishing): ₹3800<br><br>🎨 <strong>Design Charges:</strong> ₹300`,
+    "double colour letter head": `Professional <strong>Double-Colour Letterheads</strong> (A4 - 210 x 297 mm).<br><br>📋 <strong>80 Gsm Bond Sheet (Single Side):</strong><br>• 500 Nos (Loose): ₹950<br>• 1000 Nos (Loose): ₹1450<br>• 5 Pads (Finishing): ₹1100<br>• 10 Pads (Finishing): ₹1750<br><br>🎨 <strong>Design Charges:</strong> ₹200`,
+    "single colour letter head": `Professional <strong>Single-Colour Letterheads</strong> (A4 - 210 x 297 mm).<br><br>📋 <strong>80 Gsm Bond Sheet (Single Side):</strong><br>• 500 Nos (Loose): ₹750<br>• 1000 Nos (Loose): ₹1250<br>• 5 Pads (Finishing): ₹900<br>• 10 Pads (Finishing): ₹1550<br><br>🎨 <strong>Design Charges:</strong> ₹150`,
+    "thesis": `Professional <strong>Thesis Printing & Binding</strong>.<br><br>📝 <strong>Alignment (Per Page):</strong><br>• Normal: ₹20 | With Table: ₹30<br><br>📄 <strong>Printing (Per Page):</strong><br>• B/W (80gsm Copier): ₹1.5<br>• B/W (Bond 85gsm): ₹2<br>• Color (Bond 85gsm): ₹10 - ₹12<br><br>📚 <strong>Binding (Per Book):</strong><br>• Standard (2 Days): ₹350 (Incl. Design/Print/Lam)<br>• Express Bind (4 hrs): ₹450`,
+    "cd": `Professional <strong>CD Services</strong>.<br><br>💿 <strong>Sticker:</strong> ₹150 (with Design)<br>📂 <strong>Writing:</strong> ₹40 (with CD and Pouch)`,
+    "prescription pad": `Professional <strong>Prescription Pads</strong>.<br><br>📋 <strong>A5 (70gsm SC):</strong><br>• 1000 Nos: ₹500 (Loose) | ₹750 (Pad)<br>• 2000 Nos: ₹800 (Loose) | ₹1200 (Pad)<br><br>📋 <strong>A4 (70gsm SC):</strong><br>• 1000 Nos: ₹800 (Loose) | ₹1050 (Pad)<br>• 2000 Nos: ₹1600 (Loose) | ₹2100 (Pad)<br><br>📋 <strong>A4 (80gsm MC):</strong><br>• 1000 Nos: ₹4000 (Loose) | ₹4250 (Pad)<br>• 2000 Nos: ₹5000 (Loose) | ₹5500 (Pad)`,
+    "lamination": `Professional <strong>Lamination Services</strong> (Standard A4 Size).<br><br>🔥 <strong>Thermal Mode:</strong><br>• Gloss: ₹5 per A4<br>• Matt: ₹5 per A4<br>• Velvet: ₹12 per A4<br><br>💧 <strong>Glue Mode:</strong><br>• Gloss: ₹0.7 per A4<br>• Matt: ₹0.8 per A4`,
+    "doctor file - plastic": `Professional <strong>Doctor Files (Plastic)</strong>.<br><br>🚚 <strong>Despatch:</strong> 2 Weeks from Design Finalization<br><br>📋 <strong>Size 12x18 (1 Crease 4 Hole):</strong><br>• SS: ₹27 (1k) | ₹26.5 (2k) | ₹26 (3k)<br>• DS: ₹32 (1k) | ₹31.5 (2k) | ₹31 (3k)<br><br>📋 <strong>Size 12.5x19.4 (2 Crease 4 Hole):</strong><br>• SS: ₹28 (1k) | ₹27.5 (2k) | ₹27 (3k)<br>• DS: ₹33 (1k) | ₹32.5 (2k) | ₹32 (3k)`,
+    "binding": `Professional <strong>Binding Services</strong> for all needs.<br><br>📊 <strong>General Binding (Spiral/Tape/Synopsis):</strong><br>• < 50 pgs: ₹50 | 50-100 pgs: ₹80<br>• 100-200 pgs: ₹100 | 200+ pgs: ₹200<br>• Color Board: +₹15 extra<br><br>📘 <strong>Project Binding:</strong><br>• Blue Board: ₹130 | Gold/Silver: ₹150<br>• Express (4 hrs): ₹180<br><br>📕 <strong>Soft Binding:</strong> Color: ₹110 | B/W: ₹90<br><br>📓 <strong>Record Binding:</strong> ₹100 (Normal) | ₹120 (Marble)`,
+    "business cards": `Premium <strong>Digital Visiting Cards</strong> & 13x19 Sheet Printing.<br><br>📋 <strong>Digital Card Packs (per 100 nos):</strong><br>• Gloss 250gsm: SS ₹150 | FB ₹200<br>• Gloss 300gsm: SS ₹200 | FB ₹300<br>• Synthetic 175m: SS ₹300 | FB ₹400<br>• Texture Board: SS ₹250 | FB ₹350<br>• Metallic Board: SS ₹300 | FB ₹400<br>• Kraft: SS ₹260 | FB ₹450<br>• Cobble Trans: SS ₹350 | FB ₹650<br>• Ivory - Kent X: SS ₹300 | FB ₹550<br><br>📄 <strong>13 x 19 Inch Sheet Printing:</strong><br>• 130/170/250/300 GSM: ₹16 - ₹30<br>• Texture / Metallic: ₹30 - ₹50<br>• Synthetic / Ivory: ₹35 - ₹50<br>• Stickers (PVC White/Clear): ₹40<br>• CD Sticker: ₹150 (incl. design)<br><br>✨ <strong>Lamination (13x19):</strong> Gloss ₹10/side | Matt ₹15/side<br>💰 <strong>Bulk Discount:</strong> ₹1 off (51-100 sheets) | ₹2 off (101+ sheets)<br>🎨 <strong>Design Charges:</strong> SS ₹250 | DS ₹300`,
+    "offset visiting card": `Premium <strong>Offset Visiting Cards</strong> with high-quality lamination finishes — leaving a professional, lasting impression.<br><br>📋 <strong>Gloss Lamination:</strong><br>• SS 500 nos — ₹460 (₹543 incl. GST)<br>• FB 500 nos — ₹580 (₹684 incl. GST)<br>• SS 1000 nos — ₹640 (₹755 incl. GST)<br>• FB 1000 nos — ₹840 (₹991 incl. GST)<br><br>📋 <strong>Matt Lamination:</strong><br>• SS 500 nos — ₹500 (₹590 incl. GST)<br>• FB 500 nos — ₹680 (₹802 incl. GST)<br>• SS 1000 nos — ₹680 (₹802 incl. GST)<br>• FB 1000 nos — ₹900<br><br>🎨 <strong>Design Charges (extra):</strong> Single Side ₹250 | Double Side ₹350`,
   },
 
   testimonials: [
@@ -52,6 +65,191 @@ const KB = {
 };
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Product-specific selectable pricing options
+// ─────────────────────────────────────────────────────────────────────────────
+const PRODUCT_PRICING_OPTIONS: Record<string, string[]> = {
+  "offset visiting card": [
+    "Gloss | Single Side | 500 nos — ₹460 (₹543 incl. GST)",
+    "Gloss | Double Side | 500 nos — ₹580 (₹684 incl. GST)",
+    "Gloss | Single Side | 1000 nos — ₹640 (₹755 incl. GST)",
+    "Gloss | Double Side | 1000 nos — ₹840 (₹991 incl. GST)",
+    "Matt  | Single Side | 500 nos — ₹500 (₹590 incl. GST)",
+    "Matt  | Double Side | 500 nos — ₹680 (₹802 incl. GST)",
+    "Matt  | Single Side | 1000 nos — ₹680 (₹802 incl. GST)",
+    "Matt  | Double Side | 1000 nos — ₹900",
+  ],
+  "business cards": [
+    "--- CARD PACKS (100 NOS) ---",
+    "Digital | Gloss 250gsm | 100 nos — SS ₹150 / FB ₹200",
+    "Digital | Gloss 300gsm | 100 nos — SS ₹200 / FB ₹300",
+    "Digital | Synthetic 175m | 100 nos — SS ₹300 / FB ₹400",
+    "Digital | Texture Board | 100 nos — SS ₹250 / FB ₹350",
+    "Digital | Metallic Board | 100 nos — SS ₹300 / FB ₹400",
+    "Digital | Kraft Paper | 100 nos — SS ₹260 / FB ₹450",
+    "Digital | Cobble Trans | 100 nos — SS ₹350 / FB ₹650",
+    "Digital | Ivory - Kent X | 100 nos — SS ₹300 / FB ₹550",
+    "--- 13x19 SHEET PRINTING (PER COPY) ---",
+    "Sheet | 130 GSM Art Paper — SS ₹16 / FB ₹23",
+    "Sheet | 170 GSM Art Paper — SS ₹17 / FB ₹25",
+    "Sheet | 250 GSM Art Board — SS ₹19 / FB ₹28",
+    "Sheet | 300 GSM Art Board — SS ₹20 / FB ₹30",
+    "Sheet | Texture Board — SS ₹30 / FB ₹40",
+    "Sheet | Metallic Board — SS ₹40 / FB ₹50",
+    "Sheet | Synthetic 125 Mic — SS ₹35 / FB ₹45",
+    "Sheet | Synthetic 175 Mic — SS ₹40 / FB ₹50",
+    "Sheet | Ivory Board (Kent) — SS ₹35 / FB ₹45",
+    "Sheet | Mirror Coated — SS ₹25 / FB ₹35",
+    "Sheet | Sticker CH(R) — ₹20",
+    "Sheet | Sticker PVC Clear — ₹40",
+    "Sheet | Sticker PVC White — ₹40",
+    "Sheet | CD Sticker — ₹150 (incl. design)",
+  ],
+  "multi colour certificate": [
+    "Board | 300 Gsm Art Board | 1-20 nos — ₹12/cert",
+    "Board | 300 Gsm Art Board | 20-250 nos — ₹10/cert",
+    "Board | 300 Gsm Art Board | 300+ nos — ₹07/cert",
+    "Board | Textured Board — ₹20/cert",
+    "Board | Metallic Board — ₹25/cert",
+  ],
+  "multi colour letter head": [
+    "Pad | 5 Pads (Neat Finishing) — ₹2950",
+    "Pad | 10 Pads (Neat Finishing) — ₹3800",
+    "Loose | 500 Nos (Loose Sheets) — ₹2800",
+    "Loose | 1000 Nos (Loose Sheets) — ₹3500",
+  ],
+  "multi colour envelopes": [
+    "Multi-Colour | 1000 Nos (10.5x4.5) — ₹5000",
+  ],
+  "double colour envelopes": [
+    "Double-Colour | 1000 Nos (10.5x4.5) — ₹2100",
+  ],
+  "double colour letter head": [
+    "Pad | 5 Pads (Neat Finishing) — ₹1100",
+    "Pad | 10 Pads (Neat Finishing) — ₹1750",
+    "Loose | 500 Nos (Loose Sheets) — ₹950",
+    "Loose | 1000 Nos (Loose Sheets) — ₹1450",
+  ],
+  "single colour envelopes": [
+    "Single-Colour | 1000 Nos (10.5x4.5) — ₹1800",
+  ],
+  "single colour letter head": [
+    "Pad | 5 Pads (Neat Finishing) — ₹900",
+    "Pad | 10 Pads (Neat Finishing) — ₹1550",
+    "Loose | 500 Nos (Loose Sheets) — ₹750",
+    "Loose | 1000 Nos (Loose Sheets) — ₹1250",
+  ],
+  "id cards": [
+    "PVC ID Card — ₹50",
+    "Card + Holder — ₹60",
+    "Card + Holder + Normal Rope — ₹70",
+    "Card + Holder + Multi-Color Rope — ₹90",
+  ],
+  "flyer a5 ss": ["1000 Nos — ₹2850", "3000 Nos — ₹3550", "5000 Nos — ₹4250", "10000 Nos — ₹6500", "50000 Nos — ₹22900"],
+  "flyer a5 fb": ["1000 Nos — ₹2850", "3000 Nos — ₹3550", "5000 Nos — ₹4750", "10000 Nos — ₹7000", "40000 Nos — ₹20000"],
+  "flyer a4 ss": ["1000 Nos — ₹3200", "3000 Nos — ₹4600", "5000 Nos — ₹6500", "10000 Nos — ₹10500", "50000 Nos — ₹40900"],
+  "flyer a4 fb": ["1000 Nos — ₹3000", "3000 Nos — ₹5100", "5000 Nos — ₹7000", "10000 Nos — ₹11500", "40000 Nos — ₹37900"],
+  "flyer a3 ss": ["1000 Nos — ₹3900", "3000 Nos — ₹7200", "5000 Nos — ₹10500", "10000 Nos — ₹18500", "25000 Nos — ₹43500"],
+  "flyer a3 fb": ["1000 Nos — ₹3900", "3000 Nos — ₹7700", "5000 Nos — ₹11500", "10000 Nos — ₹21000", "25000 Nos — ₹49500"],
+  "flex": [
+    "--- PIECE RATES ---",
+    "3x2 Piece — ₹350",
+    "4x3 Piece — ₹450",
+    "5x3 Piece — ₹500",
+    "6x3 Piece — ₹600",
+    "8x4 Piece — ₹750",
+    "10x5 Piece — ₹950",
+    "--- MEDIA (PER SQ.FT) ---",
+    "Normal Flex — ₹12 (Above 100 sq.ft)",
+    "Black Media — ₹20",
+    "Star Flex — ₹25",
+    "Backlit / Vinyl — ₹25",
+    "Sun Pack — ₹15",
+  ],
+  "sun pack printing": [
+    "--- PIECES: 300 NOS ---",
+    "1x1 | 300 Nos — ₹15 (MC)",
+    "1x1.5 | 300 Nos — ₹22.50 (MC)",
+    "2x1.5 | 300 Nos — ₹45 (MC)",
+    "2x2 | 300 Nos — ₹60 (MC)",
+    "3x2 | 300 Nos — ₹90 (MC)",
+    "--- PIECES: 500 NOS ---",
+    "1x1 | 500 Nos — ₹14 (MC)",
+    "1x1.5 | 500 Nos — ₹21 (MC)",
+    "2x1.5 | 500 Nos — ₹42 (MC)",
+    "2x2 | 500 Nos — ₹56 (MC)",
+    "3x2 | 500 Nos — ₹84 (MC)",
+    "--- PIECES: 1000 NOS ---",
+    "1x1 | 1000 Nos — ₹12 (MC)",
+    "1x1.5 | 1000 Nos — ₹18 (MC)",
+    "2x1.5 | 1000 Nos — ₹36 (MC)",
+    "2x2 | 1000 Nos — ₹48 (MC)",
+    "3x2 | 1000 Nos — ₹72 (MC)",
+    "--- PIECES: 2000 NOS ---",
+    "1x1 | 2000 Nos — ₹11 (MC)",
+    "1x1.5 | 2000 Nos — ₹16.5 (MC)",
+    "2x1.5 | 2000 Nos — ₹33 (MC)",
+    "2x2 | 2000 Nos — ₹44 (MC)",
+    "3x2 | 2000 Nos — ₹66 (MC)",
+  ],
+  "thesis": [
+    "Binding | Standard (2 Days) — ₹350/book",
+    "Binding | Express Bind (4 hrs) — ₹450/book",
+    "Alignment | Normal — ₹20/page",
+    "Alignment | With Table — ₹30/page",
+    "Print | B/W (Bond 85gsm) — ₹2/page",
+    "Print | Color (Bond 85gsm) — ₹10/page",
+  ],
+  "cd": [
+    "CD Sticker (with Design) — ₹150",
+    "CD Writing (with CD & Pouch) — ₹40",
+  ],
+  "synopsis binding": [
+    "Binding | Less than 50 Pages — ₹50",
+    "Binding | 50 - 200 Pages — ₹100",
+    "Binding | More than 200 Pages — ₹200",
+    "Extra | Color Board — ₹15 extra",
+  ],
+  "binding": [
+    "Spiral / Tape Binding — ₹50 - ₹200",
+    "Project | Blue Board — ₹130/book",
+    "Project | Gold/Silver — ₹150/book",
+    "Express Project (4 hrs) — ₹180/book",
+    "Soft Binding (Color) — ₹110/book",
+    "Soft Binding (B/W) — ₹90/book",
+    "Record Binding — ₹100 - ₹120",
+  ],
+  "lamination": [
+    "Thermal | Gloss — ₹5/page (A4)",
+    "Thermal | Matt — ₹5/page (A4)",
+    "Thermal | Velvet — ₹12/page (A4)",
+    "Glue | Gloss — ₹0.7/page (A4)",
+    "Glue | Matt — ₹0.8/page (A4)",
+  ],
+  "prescription pad": [
+    "A5 SC | 1000 Nos (Loose) — ₹500",
+    "A5 SC | 1000 Nos (With Pad) — ₹750",
+    "A4 SC | 1000 Nos (Loose) — ₹800",
+    "A4 SC | 1000 Nos (With Pad) — ₹1050",
+    "A4 MC | 1000 Nos (With Pad) — ₹4250",
+    "--- QUANTITY: 2000 NOS ---",
+    "A5 SC | 2000 Nos (With Pad) — ₹1200",
+    "A4 SC | 2000 Nos (With Pad) — ₹2100",
+    "A4 MC | 2000 Nos (With Pad) — ₹5500",
+  ],
+  "doctor file - plastic": [
+    "12x18 SS | 1000 Nos — ₹27/ea",
+    "12x18 DS | 1000 Nos — ₹32/ea",
+    "12.5x19.4 SS | 1000 Nos — ₹28/ea",
+    "12.5x19.4 DS | 1000 Nos — ₹33/ea",
+    "--- QUANTITY: 3000 NOS ---",
+    "12x18 SS | 3000 Nos — ₹26/ea",
+    "12x18 DS | 3000 Nos — ₹31/ea",
+    "12.5x19.4 SS | 3000 Nos — ₹27/ea",
+    "12.5x19.4 DS | 3000 Nos — ₹32/ea",
+  ],
+};
+
+
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 interface ConversationEntry {
@@ -214,13 +412,7 @@ class Chatbot {
     if (this.history.length > 30) this.history.shift();
   }
 
-  /** Last N user messages as plain text */
-  private recentUserMessages(n = 3): string[] {
-    return this.history
-      .filter(e => e.role === 'user')
-      .slice(-n)
-      .map(e => e.content.toLowerCase());
-  }
+
 
   /** Check if the user seems to be asking a follow-up about the lastProduct/lastTopic */
   private isFollowUp(lw: string): boolean {
@@ -263,6 +455,69 @@ class Chatbot {
       });
       container.appendChild(btn);
     });
+    this.messagesContainer.appendChild(container);
+    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+  }
+
+  private addChecklist(options: string[], buttonText: string, onsubmit: (selected: string[]) => void) {
+    const container = document.createElement('div');
+    container.className = 'checklist-container';
+
+    const checkboxes: HTMLInputElement[] = [];
+
+    options.forEach(opt => {
+      const label = document.createElement('label');
+      label.className = 'checklist-item';
+
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = opt;
+      checkboxes.push(cb);
+
+      label.appendChild(cb);
+      label.appendChild(document.createTextNode(opt));
+      container.appendChild(label);
+    });
+
+    const btn = document.createElement('button');
+    btn.className = 'checklist-submit';
+    btn.textContent = buttonText;
+    btn.addEventListener('click', () => {
+      const selected = checkboxes.filter(c => c.checked).map(c => c.value);
+      if (selected.length === 0) return;
+      container.remove();
+      const text = selected.join(', ');
+      this.addUser(text, 'checklist-submit');
+      onsubmit(selected);
+    });
+
+    container.appendChild(btn);
+    this.messagesContainer.appendChild(container);
+    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+  }
+
+  /** Show selectable pricing option buttons. On click, captures selection as quantity+spec and jumps to deadline step. */
+  private addPricingOptions(options: string[], onSelect: (selected: string) => void) {
+    const container = document.createElement('div');
+    container.className = 'pricing-options';
+
+    const label = document.createElement('div');
+    label.className = 'pricing-options-label';
+    label.innerHTML = '👇 <strong>Select your option to proceed:</strong>';
+    container.appendChild(label);
+
+    options.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'pricing-option-btn';
+      btn.textContent = opt;
+      btn.addEventListener('click', () => {
+        container.remove();
+        this.addUser(opt, 'pricing-select');
+        onSelect(opt);
+      });
+      container.appendChild(btn);
+    });
+
     this.messagesContainer.appendChild(container);
     this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
   }
@@ -450,25 +705,38 @@ class Chatbot {
         ? `Which one interests you, <strong>${this.memory.name}</strong>? I can give you full details and arrange a quote.`
         : `Which product would you like to know more about? I can provide full details and a quotation.`, 'products');
       this.memory.lastTopic = 'products';
-      this.addQuickReplies(['🃏 Business Cards', '📚 Books', '📄 Brochures', '📅 Calendars', '💌 Invitations', '📋 Get a Quote']);
+      this.addQuickReplies(['🃏 Business Cards', '📚 Books', '📄 Brochures', '📅 Calendars', '� Synopsis Binding', '📋 Get a Quote']);
       this.isProcessing = false;
       return;
     }
 
     // ── Individual product lookup ─────────────────────────────────────────────
     const productMap: Record<string, string[]> = {
-      "books / bill books": ['book', 'bill book', 'notebook'],
-      "brochures": ['brochure', 'flyer', 'leaflet', 'pamphlet'],
-      "calendars": ['calendar', 'calender'],
-      "certificates": ['certificate', 'award'],
-      "envelopes": ['envelope'],
-      "invitations": ['invitation', 'wedding card', 'wedding invitation', 'marriage card', 'marriage invitation'],
-      "letterheads": ['letterhead', 'letter head'],
-      "logo printing": ['logo'],
-      "shields / trophies": ['shield', 'trophy'],
-      "standees": ['standee', 'banner', 'flex'],
-      "stickers": ['sticker', 'label'],
-      "business cards": ['business card', 'visiting card', 'name card'],
+      "sun pack printing": ['sun pack', 'sunpack', 'sunpack printing', 'advertisement board'],
+      "flex": ['flex', 'banner', 'hoarding', 'vinyl', 'backlit', 'sunpack', 'star flex'],
+      "id cards": ['id card', 'pvc card', 'identity card', 'idcard'],
+      "flyer a5 ss": ['flyer a5 ss', 'a5 flyer ss', 'a5 flyer single', 'a5 flyer single side'],
+      "flyer a5 fb": ['flyer a5 fb', 'a5 flyer fb', 'a5 flyer back', 'a5 flyer front and back'],
+      "flyer a4 ss": ['flyer a4 ss', 'a4 flyer ss', 'a4 flyer single', 'a4 flyer single side'],
+      "flyer a4 fb": ['flyer a4 fb', 'a4 flyer fb', 'a4 flyer back', 'a4 flyer front and back'],
+      "flyer a3 ss": ['flyer a3 ss', 'a3 flyer ss', 'a3 flyer single', 'a3 flyer single side'],
+      "flyer a3 fb": ['flyer a3 fb', 'a3 flyer fb', 'a3 flyer back', 'a3 flyer front and back'],
+      "multi colour certificate": ['certificate', 'award'],
+      "multi colour envelopes": ['multi colour envelopes', 'multi color envelope', 'multicolour envelope', 'multi colour envelope'],
+      "double colour envelopes": ['double colour envelopes', 'double color envelope', 'double colour envelope'],
+      "single colour envelopes": ['single colour envelopes', 'single color envelope', 'single colour envelope'],
+      "synopsis binding": ['synopsis', 'synopsis binding', 'tape binding'],
+      "multi colour letter head": ['multi colour letterhead', 'multi color letterhead', 'multi colour letter head'],
+      "double colour letter head": ['double colour letterhead', 'double color letterhead', 'double colour letter head', 'double colour letter'],
+      "single colour letter head": ['single colour letterhead', 'single color letterhead', 'single colour letter head'],
+      "thesis": ['thesis', 'dissertation', 'project report', 'thesis binding'],
+      "cd": ['cd', 'dvd', 'cd writing', 'cd sticker'],
+      "prescription pad": ['prescription', 'prescription pad', 'doctor pad', 'medical pad'],
+      "lamination": ['lamination', 'laminate', 'laminating', 'id lamination', 'sheet lamination'],
+      "binding": ['binding', 'spiral binding', 'hard binding', 'soft binding', 'project binding', 'comb binding'],
+      "doctor file - plastic": ['doctor file', 'plastic file', 'medical file', 'file printing'],
+      "business cards": ['business card', 'visiting card', 'name card', 'offset visiting', 'offset card', 'visiting card rate', 'card rate', 'card price', 'vc rate'],
+      "offset visiting card": ['offset visiting card'],
     };
 
     for (const [product, keywords] of Object.entries(productMap)) {
@@ -506,7 +774,36 @@ class Chatbot {
       if (this.leadData.product) {
         this.addBot(this.personalise(`Got it — I'll prepare a quote for <strong>${this.leadData.product}</strong>! 📋<br><br>What quantity are you looking for?`), 'quote');
       } else {
-        this.addBot(`📋 <strong>Let's get you a quotation${this.memory.name ? `, <strong>${this.memory.name}</strong>` : ''}!</strong><br><br>First — what product would you like to print? <em>(e.g., Books, Brochures, Calendars, Business Cards…)</em>`, 'quote');
+        this.addBot(`📋 <strong>Let's get you a quotation${this.memory.name ? `, <strong>${this.memory.name}</strong>` : ''}!</strong><br><br>First — what product(s) would you like to print?`, 'quote');
+        this.addChecklist([
+          'Sun pack printing',
+          'Flex',
+          'ID cards',
+          'Flyer A5 SS',
+          'Flyer A5 FB',
+          'Flyer A4 SS',
+          'Flyer A4 FB',
+          'Flyer A3 SS',
+          'Flyer A3 FB',
+          'Multi colour certificate',
+          'Multi colour envelopes',
+          'Double colour envelopes',
+          'Single Colour envelopes',
+          'Synopsis binding',
+          'Multi colour letter head',
+          'Double colour letter head',
+          'Single Colour Letter head',
+          'Thesis',
+          'CD',
+          'Prescription pad',
+          'Lamination',
+          'Doctor file - plastic',
+          'Binding',
+          'Business cards',
+          'Offset visiting card'
+        ], 'Confirm Products', (selected) => {
+          this.processResponse(selected.join(', '));
+        });
       }
       this.memory.lastTopic = 'quote';
       this.isProcessing = false;
@@ -598,6 +895,35 @@ class Chatbot {
       this.leadData = {};
       this.currentStep = 1;
       this.addBot(`📋 Let's start your bulk enquiry${this.memory.name ? `, <strong>${this.memory.name}</strong>` : ''}!<br><br>What product are you looking to order in bulk?`, 'bulk-quote');
+      this.addChecklist([
+        'Sun pack printing',
+        'Flex',
+        'ID cards',
+        'Flyer A5 SS',
+        'Flyer A5 FB',
+        'Flyer A4 SS',
+        'Flyer A4 FB',
+        'Flyer A3 SS',
+        'Flyer A3 FB',
+        'Multi colour certificate',
+        'Multi colour envelopes',
+        'Double colour envelopes',
+        'Single Colour envelopes',
+        'Synopsis binding',
+        'Multi colour letter head',
+        'Double colour letter head',
+        'Single Colour Letter head',
+        'Thesis',
+        'CD',
+        'Prescription pad',
+        'Lamination',
+        'Doctor file - plastic',
+        'Binding',
+        'Business cards',
+        'Offset visiting card'
+      ], 'Start Bulk Enquiry', (selected) => {
+        this.processResponse(selected.join(', '));
+      });
       this.memory.lastTopic = 'quote';
       this.isProcessing = false;
       return;
@@ -719,13 +1045,36 @@ class Chatbot {
   private handleQuoteFlow(text: string) {
     const name = this.memory.name;
     switch (this.currentStep) {
-      case 1:
+      case 1: {
         this.leadData.product = text;
         this.memory.lastProduct = text;
         if (!this.memory.mentionedProducts.includes(text)) this.memory.mentionedProducts.push(text);
-        this.currentStep = 2;
-        this.addBot(`Got it — <strong>${text}</strong>! 👍${name ? ` Great choice, <strong>${name}</strong>.` : ''}<br><br>What quantity are you looking for? <em>(e.g., 100, 500, 1000 copies)</em>`, 'quote-step');
+        // Show pricing/description if available for this product
+        const lwProduct = text.toLowerCase();
+        const productDesc = KB.products[lwProduct as keyof typeof KB.products];
+        const pricingOpts = PRODUCT_PRICING_OPTIONS[lwProduct];
+        if (productDesc) {
+          this.addBot(`📌 <strong>${text}</strong><br><br>${productDesc}`, 'product-detail');
+        } else {
+          this.addBot(`Got it — <strong>${text}</strong>! 👍${name ? ` Great choice, <strong>${name}</strong>.` : ''}`, 'quote-step');
+        }
+        if (pricingOpts) {
+          // Show selectable pricing buttons — clicking one fills quantity+specs and jumps to deadline
+          this.addPricingOptions(pricingOpts, (selected) => {
+            this.leadData.quantity = selected;
+            this.leadData.specs = selected;
+            this.currentStep = 4;
+            this.addTyping().then(() => {
+              this.addBot(`✅ <strong>${selected}</strong> selected!<br><br>When do you need the order ready by? <em>(e.g., tomorrow, next week, a specific date)</em>`, 'quote-step');
+            });
+          });
+          this.currentStep = 2; // hold — will be overridden by pricing button click
+        } else {
+          this.currentStep = 2;
+          this.addBot(`What quantity are you looking for? <em>(e.g., 100, 500, 1000 copies)</em>`, 'quote-step');
+        }
         break;
+      }
 
       case 2:
         this.leadData.quantity = text;
@@ -779,7 +1128,7 @@ class Chatbot {
     const contactDisplay = rawContact;
 
     this.addBot(
-      `✅ <strong>Enquiry captured!</strong><br><br>` +
+      `✅ <strong>order placed!</strong><br><br>` +
       `• <strong>Product:</strong> ${this.leadData.product}<br>` +
       `• <strong>Quantity:</strong> ${this.leadData.quantity}<br>` +
       `• <strong>Specifications:</strong> ${this.leadData.specs}<br>` +
@@ -788,7 +1137,7 @@ class Chatbot {
       'quote-done'
     );
     this.addBot(
-      `${extractedName ? `Thank you, <strong>${extractedName}</strong>! ` : 'Thank you! '}Our sales executive will contact you shortly with competitive pricing.<br><br>📞 <strong>${KB.company.phone}</strong>`,
+      `${extractedName ? `Thank you, <strong>${extractedName}</strong>! ` : 'Thank you! '}Our sales executive will contact you shortly.<br><br>📞 <strong>${KB.company.phone}</strong>`,
       'quote-done'
     );
 
