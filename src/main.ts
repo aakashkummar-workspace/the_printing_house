@@ -272,8 +272,9 @@ interface LeadData {
   product?: string;
   quantity?: string;
   specs?: string;
-  deadline?: string;
   name?: string;
+  phone?: string;
+  selections?: Record<string, string>; // itemized choices
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -302,55 +303,11 @@ function extractName(text: string): string | null {
 }
 
 /** Format a Date object as D/M/YYYY */
-function formatDate(d: Date): string {
-  return `${d.getDate()}/${d.getMonth() + 1}/${d.getFullYear()}`;
-}
 
 /**
  * Converts relative date words to real calendar dates using the system clock.
  * Any other text is returned unchanged.
  */
-function resolveDeadline(text: string): string {
-  const lw = text.toLowerCase().trim();
-  const today = new Date();
-
-  const add = (days: number): string => {
-    const d = new Date(today);
-    d.setDate(d.getDate() + days);
-    return formatDate(d);
-  };
-
-  if (lw === 'today') return `${formatDate(today)} (today)`;
-  if (lw === 'tomorrow') return `${add(1)} (tomorrow)`;
-  if (lw === 'day after tomorrow' || lw === 'day after') return `${add(2)} (day after tomorrow)`;
-  if (lw === 'next week') return `${add(7)} (next week)`;
-  if (lw === 'next month') {
-    const d = new Date(today);
-    d.setMonth(d.getMonth() + 1);
-    return `${formatDate(d)} (next month)`;
-  }
-  // Helper to parse English numbers up to 10
-  const parseNum = (n: string): number => {
-    const map: Record<string, number> = { one: 1, two: 2, three: 3, four: 4, five: 5, six: 6, seven: 7, eight: 8, nine: 9, ten: 10 };
-    return map[n] || parseInt(n);
-  };
-
-  // "in X days" or "after X days"
-  const inDays = lw.match(/^(?:in|after)\s+(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+days?$/);
-  if (inDays) {
-    const n = parseNum(inDays[1]);
-    return `${add(n)} (in ${n} days)`;
-  }
-
-  // "X days" → e.g. "3 days"
-  const justDays = lw.match(/^(\d+|one|two|three|four|five|six|seven|eight|nine|ten)\s+days?$/);
-  if (justDays) {
-    const n = parseNum(justDays[1]);
-    return `${add(n)} (in ${n} days)`;
-  }
-
-  return text; // Not a relative term — keep as-is
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Chatbot Class
@@ -368,6 +325,7 @@ class Chatbot {
   private leadData: LeadData = {};
   private currentStep: number = 0;
   private isProcessing: boolean = false;
+  private pendingProducts: string[] = [];
 
   constructor() {
     this.messagesContainer = document.getElementById('chat-messages')!;
@@ -387,10 +345,14 @@ class Chatbot {
       refreshBtn.addEventListener('click', () => this.resetConversation());
     }
 
+    this.showWelcomeGreeting();
+  }
+
+  private showWelcomeGreeting() {
     setTimeout(() => {
       this.addBot(`👋 Welcome to <strong>The Printing House</strong>, Trichy!`, 'greeting');
       this.addBot(`I'm your printing consultant — here to help with quotes, product info, services, and more. With <strong>40+ years of expertise</strong>, we handle everything from business cards to bulk commercial printing. How can I help you today?`, 'greeting');
-      this.addQuickReplies(['📋 Get a Quote', '📦 Our Products', '🛠️ Our Services', '📍 Location & Contact', '⏰ Working Hours']);
+      this.addQuickReplies(['📋 Get a Quote', '📦 Our Products', '📍 Location & Contact', '⏰ Working Hours']);
     }, 600);
   }
 
@@ -539,13 +501,11 @@ class Chatbot {
     this.history = [];
     this.memory = { mentionedProducts: [] };
     this.leadData = {};
+    this.pendingProducts = [];
     this.currentStep = 0;
     this.isProcessing = false;
     this.messagesContainer.innerHTML = '';
-    setTimeout(() => {
-      this.addBot(`🔄 Conversation restarted! How can I help you?`, 'reset');
-      this.addQuickReplies(['📋 Get a Quote', '📦 Our Products', '🛠️ Our Services', '📍 Location & Contact', '⏰ Working Hours']);
-    }, 200);
+    this.showWelcomeGreeting();
   }
 
   // ── Input ──────────────────────────────────────────────────────────────────
@@ -739,6 +699,17 @@ class Chatbot {
       "offset visiting card": ['offset visiting card'],
     };
 
+    // Check if ANY product key is mentioned even partially (to stop auto-resorting to lastProduct)
+    let hasNewProductMention = false;
+    for (const keywords of Object.values(productMap)) {
+      if (matchesAny(lw, keywords)) {
+        hasNewProductMention = true;
+        break;
+      }
+    }
+    // Specific check for generic 'flyer' to prevent falling through
+    if (lw.includes('flyer')) hasNewProductMention = true;
+
     for (const [product, keywords] of Object.entries(productMap)) {
       if (matchesAny(lw, keywords)) {
         const desc = KB.products[product as keyof typeof KB.products];
@@ -763,11 +734,21 @@ class Chatbot {
       }
     }
 
+    // Handle generic 'flyer' mention that wasn't caught by specific types
+    if (lw.includes('flyer')) {
+      this.addBot(`📄 <strong>Flyers & Leaflets</strong><br><br>We offer high-quality flyers in A5, A4, and A3 sizes with various paper options.`, 'flyer-choice');
+      this.addBot(`Which size would you like a price for?`, 'flyer-choice');
+      this.addQuickReplies(['Flyer A5', 'Flyer A4', 'Flyer A3']);
+      this.memory.lastTopic = 'product-choice';
+      this.isProcessing = false;
+      return;
+    }
+
     // ── Quote / pricing ───────────────────────────────────────────────────────
     if (matchesAny(lw, ['quote', 'quotation', 'price', 'cost', 'rate', 'how much', 'estimate', 'pricing', 'charges', 'yes, get quote', 'get a quote'])) {
       this.leadData = {};
-      // Pre-fill product from memory if we were just discussing one
-      if (this.memory.lastProduct && lw.includes('how much') || lw.includes('price') || lw.includes('cost')) {
+      // Pre-fill product from memory ONLY if they haven't mentioned a different product in this specific message
+      if (!hasNewProductMention && this.memory.lastProduct && (lw.includes('how much') || lw.includes('price') || lw.includes('cost'))) {
         this.leadData.product = this.memory.lastProduct;
       }
       this.currentStep = this.leadData.product ? 2 : 1;
@@ -1047,121 +1028,176 @@ class Chatbot {
     switch (this.currentStep) {
       case 1: {
         this.leadData.product = text;
+        this.leadData.selections = {};
         this.memory.lastProduct = text;
         if (!this.memory.mentionedProducts.includes(text)) this.memory.mentionedProducts.push(text);
-        // Show pricing/description if available for this product
-        const lwProduct = text.toLowerCase();
-        const productDesc = KB.products[lwProduct as keyof typeof KB.products];
-        const pricingOpts = PRODUCT_PRICING_OPTIONS[lwProduct];
-        if (productDesc) {
-          this.addBot(`📌 <strong>${text}</strong><br><br>${productDesc}`, 'product-detail');
+
+        if (text.includes(',')) {
+          this.pendingProducts = text.split(',').map(p => p.trim());
+          this.moveToNextProductSelection();
         } else {
-          this.addBot(`Got it — <strong>${text}</strong>! 👍${name ? ` Great choice, <strong>${name}</strong>.` : ''}`, 'quote-step');
-        }
-        if (pricingOpts) {
-          // Show selectable pricing buttons — clicking one fills quantity+specs and jumps to deadline
-          this.addPricingOptions(pricingOpts, (selected) => {
-            this.leadData.quantity = selected;
-            this.leadData.specs = selected;
-            this.currentStep = 4;
-            this.addTyping().then(() => {
-              this.addBot(`✅ <strong>${selected}</strong> selected!<br><br>When do you need the order ready by? <em>(e.g., tomorrow, next week, a specific date)</em>`, 'quote-step');
-            });
-          });
-          this.currentStep = 2; // hold — will be overridden by pricing button click
-        } else {
-          this.currentStep = 2;
-          this.addBot(`What quantity are you looking for? <em>(e.g., 100, 500, 1000 copies)</em>`, 'quote-step');
+          this.pendingProducts = [text];
+          this.moveToNextProductSelection();
         }
         break;
       }
 
-      case 2:
-        this.leadData.quantity = text;
-        this.currentStep = 3;
-        this.addBot(`<strong>${text} copies</strong> noted! 📊<br><br>What size or specifications do you need? <em>(e.g., A4, A5, custom size, paper type, single/double sided)</em>`, 'quote-step');
-        break;
+      case 2: {
+        const currentProduct = this.pendingProducts[0];
+        if (currentProduct && this.leadData.selections) {
+          this.leadData.selections[currentProduct] = text;
+        }
+        this.pendingProducts.shift(); // remove processed
 
-      case 3:
-        this.leadData.specs = text;
-        this.currentStep = 4;
-        this.addBot(`Specifications noted. When do you need the order ready by? <em>(your deadline or expected delivery date)</em>`, 'quote-step');
+        if (this.pendingProducts.length > 0) {
+          this.moveToNextProductSelection();
+        } else {
+          this.currentStep = 3;
+          this.addBot(`Got it! All items configured. 📝<br><br>Now${name ? `, <strong>${name}</strong>` : ''}, could you please share your <strong>Name</strong>?`, 'quote-step');
+        }
         break;
+      }
+
+      case 3: {
+        const trimmedName = text.trim();
+        if (trimmedName.length < 2) {
+          this.addBot(`I'm sorry, could you please provide a valid <strong>Name</strong>? (At least 2 characters)`, 'quote-step');
+          return;
+        }
+        this.leadData.name = trimmedName;
+        const nm = extractName(trimmedName);
+        if (nm && !this.memory.name) this.memory.name = nm;
+        this.currentStep = 4;
+        this.addBot(`Thank you, <strong>${trimmedName}</strong>! Finally, what is your <strong>Phone Number</strong>?`, 'quote-step');
+        break;
+      }
 
       case 4: {
-        // Prevent common paper sizes from being accepted as a deadline
-        if (matchesAny(text.toLowerCase(), ['a4', 'a5', 'a3', 'letter', 'legal'])) {
-          this.addBot(`It looks like you entered a paper size (<strong>${text}</strong>). Could you tell me the <strong>date or timeframe</strong> you need this order completed by instead? 📅`, 'quote-step');
-          return; // Stay on step 4
+        const trimmedPhone = text.trim();
+        const digitsOnly = trimmedPhone.replace(/\D/g, '');
+        if (digitsOnly.length < 10) {
+          this.addBot(`Please provide a valid <strong>Phone Number</strong> (e.g., 10 digits) so we can reach you with the quote.`, 'quote-step');
+          return;
         }
-
-        // Resolve relative date terms to real dates from the system clock
-        const resolvedDeadline = resolveDeadline(text);
-        this.leadData.deadline = resolvedDeadline;
-        this.currentStep = 5;
-        const deadlineMsg = resolvedDeadline !== text
-          ? `Got it — delivery by <strong>${resolvedDeadline}</strong>. 📅`
-          : `Deadline noted: <strong>${resolvedDeadline}</strong>. 📅`;
-        this.addBot(`${deadlineMsg}<br><br>Almost done${name ? `, <strong>${name}</strong>` : ''}! 😊 Could you share your <strong>Name and Phone Number</strong> so our team can send you the formal quotation?`, 'quote-step');
-        break;
-      }
-
-      case 5:
-        // If we already know the name, use it
-        if (this.memory.name && text.trim().length < 5) {
-          this.leadData.name = this.memory.name;
-        } else {
-          this.leadData.name = text;
-          const nm = extractName(text);
-          if (nm && !this.memory.name) this.memory.name = nm;
-        }
+        this.leadData.phone = trimmedPhone;
         this.finishQuote();
         break;
+      }
+    }
+  }
+
+  private moveToNextProductSelection() {
+    const p = this.pendingProducts[0];
+    const lwProduct = p.toLowerCase();
+    const productDesc = KB.products[lwProduct as keyof typeof KB.products];
+    const pricingOpts = PRODUCT_PRICING_OPTIONS[lwProduct];
+
+    this.currentStep = 2;
+
+    if (productDesc) {
+      this.addBot(`📊 <strong>Rate Card: ${p}</strong><br><br>${productDesc}`, 'product-detail');
+    }
+
+    if (pricingOpts) {
+      this.addPricingOptions(pricingOpts, (selected) => {
+        this.handleQuoteFlow(selected);
+      });
+    } else {
+      this.addBot(`What size or specifications do you need for <strong>${p}</strong>?`, 'quote-step');
     }
   }
 
   private finishQuote() {
-    const rawContact = this.leadData.name || '';
-    const extractedName = this.memory.name || extractName(rawContact) || '';
+    const extractedName = this.memory.name || extractName(this.leadData.name || '') || '';
 
-    // Create a display string for the contact info bullet
-    const contactDisplay = rawContact;
+    // ── 1. Render Quotation-style UI message ──────────────────────────────
+    const quotationHtml = `
+      <div id="quotation-summary-card" class="quotation-box" style="background: white; color: #1e293b; padding: 15px; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); font-family: 'Inter', sans-serif;">
+        <div style="text-align: center; border-bottom: 2px solid #3b82f6; padding-bottom: 10px; margin-bottom: 15px;">
+          <img src="/logo.png" alt="Logo" style="height: 40px; margin-bottom: 5px;">
+          <div style="font-weight: 800; font-size: 1.2rem; text-transform: uppercase; color: #1e3a8a;">${KB.company.name}</div>
+          <div style="font-size: 0.75rem; color: #64748b; line-height: 1.2;">
+            ${KB.company.location}<br>
+            📞 ${KB.company.phone} | ✉️ ${KB.company.email}
+          </div>
+        </div>
+        
+        <div style="font-size: 0.85rem; margin-bottom: 12px;">
+          <div style="font-weight: 700; color: #3b82f6; text-transform: uppercase; margin-bottom: 8px; font-size: 0.75rem; border-bottom: 1px dashed #cbd5e1;">Enquiry Details</div>
+          <div style="line-height: 1.4;">
+            ${Object.entries(this.leadData.selections || {}).map(([prod, spec]) => `
+              <div style="margin-bottom: 8px; border-left: 3px solid #3b82f6; padding-left: 8px;">
+                <div style="font-weight: 700; color: #1e3a8a; font-size: 0.8rem;">${prod}</div>
+                <div style="font-size: 0.75rem; color: #475569;">${spec}</div>
+              </div>
+            `).join('')}
+            
+            <div style="display: grid; grid-template-columns: 85px 1fr; gap: 4px; margin-top: 8px; border-top: 1px solid #f1f5f9; pt-4;">
+              <span style="color: #64748b;">Customer:</span><span style="font-weight: 600;">${this.leadData.name}</span>
+              <span style="color: #64748b;">Phone:</span><span style="font-weight: 600;">${this.leadData.phone}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div style="text-align: center; font-size: 0.7rem; color: #94a3b8; font-style: italic; border-top: 1px solid #f1f5f9; pt-8 mt-8;">
+          Thank you for choosing The Printing House!
+        </div>
+      </div>
+    `;
 
-    this.addBot(
-      `✅ <strong>order placed!</strong><br><br>` +
-      `• <strong>Product:</strong> ${this.leadData.product}<br>` +
-      `• <strong>Quantity:</strong> ${this.leadData.quantity}<br>` +
-      `• <strong>Specifications:</strong> ${this.leadData.specs}<br>` +
-      `• <strong>Deadline:</strong> ${this.leadData.deadline}<br>` +
-      `• <strong>Name / Contact:</strong> ${contactDisplay}`,
-      'quote-done'
-    );
+    this.addBot(`✅ <strong>Quotation Generated!</strong><br>${quotationHtml}`, 'quote-done');
+
     this.addBot(
       `${extractedName ? `Thank you, <strong>${extractedName}</strong>! ` : 'Thank you! '}Our sales executive will contact you shortly.<br><br>📞 <strong>${KB.company.phone}</strong>`,
       'quote-done'
     );
 
-    // Add context to WhatsApp pre-filled text
-    const waText = `Hi! I just submitted an enquiry for ${this.leadData.product || 'printing'}.\n\n` +
-      `Product: ${this.leadData.product}\n` +
-      `Quantity: ${this.leadData.quantity}\n` +
-      `Specs: ${this.leadData.specs}\n` +
-      `Deadline: ${this.leadData.deadline}\n` +
-      `Contact: ${contactDisplay}`;
+    const waText = `Hi! I just submitted an enquiry to The Printing House.\n\n` +
+      `Enquiry Items:\n` +
+      Object.entries(this.leadData.selections || {}).map(([p, s]) => `• ${p}: ${s}`).join('\n') +
+      `\n\nName: ${this.leadData.name}\n` +
+      `Phone: ${this.leadData.phone}`;
 
     this.addBot(
       `<a href="https://wa.me/${KB.company.whatsapp}?text=${encodeURIComponent(waText)}" target="_blank" class="cta-button" style="display:inline-block; margin-top:10px; text-decoration:none;">💬 Follow up on WhatsApp →</a>`,
       'quote-done'
     );
 
-    // Send email via FormSubmit AJAX API silently in background
+    // ── 2. Professional Plain-Text Receipt for Email ──────────────────
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+    const refNum = Math.floor(1000 + Math.random() * 9000);
+
+    const plainTextReceipt = [
+      `==========================================`,
+      `       THE PRINTING HOUSE - TRICHY        `,
+      `          --- ENQUIRY RECEIPT ---         `,
+      `==========================================`,
+      `Ref No : TPH-${refNum} `,
+      `Date   : ${dateStr}`,
+      `------------------------------------------`,
+      `CUSTOMER DETAILS:`,
+      `Name   : ${this.leadData.name}`,
+      `Phone  : ${this.leadData.phone}`,
+      `------------------------------------------`,
+      `ENQUIRY DETAILS:`,
+      ...Object.entries(this.leadData.selections || {}).map(([p, s]) => ` - ${p}: ${s}`),
+      `------------------------------------------`,
+      `        Thank you for your enquiry!        `,
+      `    Our team will contact you shortly.    `,
+      `==========================================`,
+      `Shop: No 6, Race Course Road, Trichy`,
+      `Ph  : +91 90031 69615`,
+      `==========================================`
+    ].join('\n');
+
     const emailBody = {
-      _subject: `New Printing Enquiry: ${this.leadData.product || 'General'}`,
+      _subject: `QUOTATION ENQUIRY [TPH-${refNum}]: ${Object.keys(this.leadData.selections || {}).join(', ')}`,
+      ENQUIRY_RECEIPT: plainTextReceipt,
+      // Metadata for FormSubmit dashboard filtering
+      Customer_Name: this.leadData.name,
+      Customer_Phone: this.leadData.phone,
       Product: this.leadData.product,
-      Quantity: this.leadData.quantity,
-      Specifications: this.leadData.specs,
-      Deadline: this.leadData.deadline,
-      Name_and_Contact: contactDisplay,
       _template: 'table'
     };
 
@@ -1183,11 +1219,17 @@ class Chatbot {
     setTimeout(() => {
       this.addBot(`Is there anything else I can help you with${this.memory.name ? `, <strong>${this.memory.name}</strong>` : ''}?`, 'quote-done');
       this.addQuickReplies(['📦 Our Products', '🛠️ Our Services', '📍 Location & Contact']);
+
+      // Scroll back to the quotation card so it's visible
+      const card = document.getElementById('quotation-summary-card');
+      if (card) {
+        card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
     }, 900);
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 document.addEventListener('DOMContentLoaded', () => {
   new Chatbot();
 });
