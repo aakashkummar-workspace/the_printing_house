@@ -361,11 +361,6 @@ class Chatbot {
     return this.memory.name ? `${this.memory.name}` : '';
   }
 
-  private personalise(msg: string): string {
-    if (!this.memory.name) return msg;
-    // Prepend name naturally
-    return msg.replace(/^(Got it|Great|Perfect|Sure|Certainly|Absolutely|Understood|Thanks|Thank you)([,!.]?)/, `$1, <strong>${this.memory.name}</strong>$2`);
-  }
 
   /** Push to history array */
   private recordHistory(role: 'user' | 'bot', content: string, intent: string) {
@@ -751,41 +746,10 @@ class Chatbot {
       if (!hasNewProductMention && this.memory.lastProduct && (lw.includes('how much') || lw.includes('price') || lw.includes('cost'))) {
         this.leadData.product = this.memory.lastProduct;
       }
-      this.currentStep = this.leadData.product ? 2 : 1;
-      if (this.leadData.product) {
-        this.addBot(this.personalise(`Got it — I'll prepare a quote for <strong>${this.leadData.product}</strong>! 📋<br><br>What quantity are you looking for?`), 'quote');
-      } else {
-        this.addBot(`📋 <strong>Let's get you a quotation${this.memory.name ? `, <strong>${this.memory.name}</strong>` : ''}!</strong><br><br>First — what product(s) would you like to print?`, 'quote');
-        this.addChecklist([
-          'Sun pack printing',
-          'Flex',
-          'ID cards',
-          'Flyer A5 SS',
-          'Flyer A5 FB',
-          'Flyer A4 SS',
-          'Flyer A4 FB',
-          'Flyer A3 SS',
-          'Flyer A3 FB',
-          'Multi colour certificate',
-          'Multi colour envelopes',
-          'Double colour envelopes',
-          'Single Colour envelopes',
-          'Synopsis binding',
-          'Multi colour letter head',
-          'Double colour letter head',
-          'Single Colour Letter head',
-          'Thesis',
-          'CD',
-          'Prescription pad',
-          'Lamination',
-          'Doctor file - plastic',
-          'Binding',
-          'Business cards',
-          'Offset visiting card'
-        ], 'Confirm Products', (selected) => {
-          this.processResponse(selected.join(', '));
-        });
-      }
+
+      this.currentStep = 1; // Start with Name
+      this.addBot(`📋 <strong>Let's get you a quotation${this.memory.name ? `, <strong>${this.memory.name}</strong>` : ''}!</strong><br><br>First — could you please share your <strong>Name</strong>?`, 'quote');
+
       this.memory.lastTopic = 'quote';
       this.isProcessing = false;
       return;
@@ -874,37 +838,9 @@ class Chatbot {
     // ── Start bulk enquiry (quick reply) ──────────────────────────────────────
     if (matchesAny(lw, ['start bulk enquiry', 'bulk enquiry'])) {
       this.leadData = {};
-      this.currentStep = 1;
-      this.addBot(`📋 Let's start your bulk enquiry${this.memory.name ? `, <strong>${this.memory.name}</strong>` : ''}!<br><br>What product are you looking to order in bulk?`, 'bulk-quote');
-      this.addChecklist([
-        'Sun pack printing',
-        'Flex',
-        'ID cards',
-        'Flyer A5 SS',
-        'Flyer A5 FB',
-        'Flyer A4 SS',
-        'Flyer A4 FB',
-        'Flyer A3 SS',
-        'Flyer A3 FB',
-        'Multi colour certificate',
-        'Multi colour envelopes',
-        'Double colour envelopes',
-        'Single Colour envelopes',
-        'Synopsis binding',
-        'Multi colour letter head',
-        'Double colour letter head',
-        'Single Colour Letter head',
-        'Thesis',
-        'CD',
-        'Prescription pad',
-        'Lamination',
-        'Doctor file - plastic',
-        'Binding',
-        'Business cards',
-        'Offset visiting card'
-      ], 'Start Bulk Enquiry', (selected) => {
-        this.processResponse(selected.join(', '));
-      });
+      this.currentStep = 1; // Start with Name
+      this.addBot(`📋 Let's start your bulk enquiry${this.memory.name ? `, <strong>${this.memory.name}</strong>` : ''}!<br><br>Could you please share your <strong>Name</strong>?`, 'bulk-quote');
+
       this.memory.lastTopic = 'quote';
       this.isProcessing = false;
       return;
@@ -967,14 +903,13 @@ class Chatbot {
   private handleFollowUp(lw: string) {
     const topic = this.memory.lastTopic;
     const product = this.memory.lastProduct;
-    const name = this.greet();
 
     // "how much / pricing" follow-up → quote for last product
     if (matchesAny(lw, ['how much', 'price', 'cost', 'rate', 'pricing for', 'how much for it', 'how much for that'])) {
       if (product) {
         this.leadData = { product };
         this.currentStep = 2;
-        this.addBot(`Sure${name ? `, <strong>${name}</strong>` : ''}! I'll prepare a quote for <strong>${product}</strong>. What quantity are you looking for?`, 'quote');
+        this.addBot(`Sure ${this.memory.name ? `<strong>${this.memory.name}</strong>` : ''}! I'll prepare a quote for <strong>${product}</strong>. What quantity are you looking for?`, 'quote');
         this.memory.lastTopic = 'quote';
         return;
       }
@@ -998,7 +933,7 @@ class Chatbot {
     }
 
     // Generic follow-up we couldn't resolve
-    this.addBot(`I'm sorry, I didn't quite catch that. Could you clarify what you'd like to know more about${name ? `, <strong>${name}</strong>` : ''}? Here are some options:`, 'follow-up-unclear');
+    this.addBot(`I'm sorry, I didn't quite catch that. Could you clarify what you'd like to know more about ${this.memory.name ? `<strong>${this.memory.name}</strong>` : ''}? Here are some options:`, 'follow-up-unclear');
     this.addQuickReplies(['📋 Get a Quote', '📦 Our Products', '🛠️ Our Services', '📍 Location']);
   }
 
@@ -1026,23 +961,62 @@ class Chatbot {
   private handleQuoteFlow(text: string) {
     const name = this.memory.name;
     switch (this.currentStep) {
-      case 1: {
-        this.leadData.product = text;
-        this.leadData.selections = {};
-        this.memory.lastProduct = text;
-        if (!this.memory.mentionedProducts.includes(text)) this.memory.mentionedProducts.push(text);
+      case 1: { // Step 1: Capture Name
+        const trimmedName = text.trim();
+        if (trimmedName.length < 2) {
+          this.addBot(`I'm sorry, could you please provide a valid <strong>Name</strong>? (At least 2 characters)`, 'quote-step');
+          return;
+        }
+        this.leadData.name = trimmedName;
+        const nm = extractName(trimmedName);
+        if (nm && !this.memory.name) this.memory.name = nm;
 
-        if (text.includes(',')) {
-          this.pendingProducts = text.split(',').map(p => p.trim());
+        this.currentStep = 2; // Move to Phone
+        this.addBot(`Thank you, <strong>${trimmedName}</strong>! Now, what is your <strong>Phone Number</strong>?`, 'quote-step');
+        break;
+      }
+
+      case 2: { // Step 2: Capture Phone
+        const trimmedPhone = text.trim();
+        const digitsOnly = trimmedPhone.replace(/\D/g, '');
+        if (digitsOnly.length < 10) {
+          this.addBot(`Please provide a valid <strong>Phone Number</strong> (e.g., 10 digits) so we can reach you with the quote.`, 'quote-step');
+          return;
+        }
+        this.leadData.phone = trimmedPhone;
+
+        // If product already known from memory/intent, skip selection
+        if (this.leadData.product) {
+          this.pendingProducts = [this.leadData.product];
           this.moveToNextProductSelection();
         } else {
-          this.pendingProducts = [text];
-          this.moveToNextProductSelection();
+          this.currentStep = 3; // Move to Product Selection
+          this.addBot(`Got it! Now, what product(s) would you like to print?`, 'quote-step');
+          this.addChecklist([
+            'Sun pack printing', 'Flex', 'ID cards', 'Flyer A5 SS', 'Flyer A5 FB', 'Flyer A4 SS', 'Flyer A4 FB',
+            'Flyer A3 SS', 'Flyer A3 FB', 'Multi colour certificate', 'Multi colour envelopes', 'Double colour envelopes',
+            'Single Colour envelopes', 'Synopsis binding', 'Multi colour letter head', 'Double colour letter head',
+            'Single Colour Letter head', 'Thesis', 'CD', 'Prescription pad', 'Lamination', 'Doctor file - plastic',
+            'Binding', 'Business cards', 'Offset visiting card'
+          ], 'Confirm Products', (selected) => {
+            this.handleQuoteFlow(selected.join(', '));
+          });
         }
         break;
       }
 
-      case 2: {
+      case 3: { // Step 3: Capture Product Selection
+        this.leadData.selections = {};
+        if (text.includes(',')) {
+          this.pendingProducts = text.split(',').map(p => p.trim());
+        } else {
+          this.pendingProducts = [text.trim()];
+        }
+        this.moveToNextProductSelection();
+        break;
+      }
+
+      case 4: { // Step 4: Capture Product Specs/Pricing
         const currentProduct = this.pendingProducts[0];
         if (currentProduct && this.leadData.selections) {
           this.leadData.selections[currentProduct] = text;
@@ -1052,35 +1026,8 @@ class Chatbot {
         if (this.pendingProducts.length > 0) {
           this.moveToNextProductSelection();
         } else {
-          this.currentStep = 3;
-          this.addBot(`Got it! All items configured. 📝<br><br>Now${name ? `, <strong>${name}</strong>` : ''}, could you please share your <strong>Name</strong>?`, 'quote-step');
+          this.finishQuote(); // Completed All
         }
-        break;
-      }
-
-      case 3: {
-        const trimmedName = text.trim();
-        if (trimmedName.length < 2) {
-          this.addBot(`I'm sorry, could you please provide a valid <strong>Name</strong>? (At least 2 characters)`, 'quote-step');
-          return;
-        }
-        this.leadData.name = trimmedName;
-        const nm = extractName(trimmedName);
-        if (nm && !this.memory.name) this.memory.name = nm;
-        this.currentStep = 4;
-        this.addBot(`Thank you, <strong>${trimmedName}</strong>! Finally, what is your <strong>Phone Number</strong>?`, 'quote-step');
-        break;
-      }
-
-      case 4: {
-        const trimmedPhone = text.trim();
-        const digitsOnly = trimmedPhone.replace(/\D/g, '');
-        if (digitsOnly.length < 10) {
-          this.addBot(`Please provide a valid <strong>Phone Number</strong> (e.g., 10 digits) so we can reach you with the quote.`, 'quote-step');
-          return;
-        }
-        this.leadData.phone = trimmedPhone;
-        this.finishQuote();
         break;
       }
     }
@@ -1092,7 +1039,7 @@ class Chatbot {
     const productDesc = KB.products[lwProduct as keyof typeof KB.products];
     const pricingOpts = PRODUCT_PRICING_OPTIONS[lwProduct];
 
-    this.currentStep = 2;
+    this.currentStep = 4; // Capture specs/pricing
 
     if (productDesc) {
       this.addBot(`📊 <strong>Rate Card: ${p}</strong><br><br>${productDesc}`, 'product-detail');
