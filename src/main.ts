@@ -274,6 +274,7 @@ interface LeadData {
   specs?: string;
   name?: string;
   phone?: string;
+  email?: string;
   selections?: Record<string, string>; // itemized choices
 }
 
@@ -707,23 +708,23 @@ class Chatbot {
 
     for (const [product, keywords] of Object.entries(productMap)) {
       if (matchesAny(lw, keywords)) {
-        const desc = KB.products[product as keyof typeof KB.products];
-        // Check if user already asked about this product (memory)
-        const alreadyMentioned = this.memory.mentionedProducts.includes(product);
-        if (alreadyMentioned && this.memory.lastProduct === product) {
-          this.addBot(`You asked about <strong>${product}</strong> earlier — here's a quick recap:<br><br>${desc}`, product);
-          this.addBot(`Ready to place an order or get a formal quote${this.memory.name ? `, <strong>${this.memory.name}</strong>` : ''}?`, product);
-        } else {
-          this.addBot(`📌 <strong>${product.charAt(0).toUpperCase() + product.slice(1)}</strong><br><br>${desc}`, product);
-          this.addBot(`Would you like a quotation for your ${product} order${this.memory.name ? `, <strong>${this.memory.name}</strong>` : ''}?`, product);
-        }
+        // Instead of showing the rate card immediately, start the lead capture flow
+        this.leadData = { product: product };
+
+        // Show a quick acknowledgment before asking for the name
+        this.addBot(`Great! You're interested in <strong>${product.charAt(0).toUpperCase() + product.slice(1)}</strong>.`, 'product-ack');
+
+        // Start the quote flow (Name -> Phone -> Email -> Rate Card)
+        this.currentStep = 1;
+        this.addBot(`📋 <strong>Let's get you those details${this.memory.name ? `, <strong>${this.memory.name}</strong>` : ''}!</strong><br><br>First — could you please share your <strong>Name</strong>?`, 'quote');
+
         this.memory.lastProduct = product;
-        this.memory.lastTopic = 'product-detail';
+        this.memory.lastTopic = 'quote';
         this.memory.lastIntent = product;
         if (!this.memory.mentionedProducts.includes(product)) {
           this.memory.mentionedProducts.push(product);
         }
-        this.addQuickReplies(['📋 Yes, get quote', '📦 See All Products', '📞 Call Us']);
+
         this.isProcessing = false;
         return;
       }
@@ -892,7 +893,7 @@ class Chatbot {
 
     // ── Fallback ──────────────────────────────────────────────────────────────
     const name = this.greet();
-    this.addBot(`I'm here to help with all things related to <strong>The Printing House</strong>${name ? `, <strong>${name}</strong>` : ''}! Here's what I can assist with:`, 'fallback');
+    this.addBot(`Hello${name ? `, <strong>${name}</strong>` : ''}! 👋 Welcome to <strong>The Printing House</strong>. How can I assist you today?`, 'fallback');
     this.addQuickReplies(['📋 Get a Quote', '📦 Our Products', '🛠️ Our Services', '📍 Location & Hours', '💬 WhatsApp']);
     this.isProcessing = false;
   }
@@ -985,12 +986,26 @@ class Chatbot {
         }
         this.leadData.phone = trimmedPhone;
 
+        this.currentStep = 3; // Move to Email
+        this.addBot(`Great! Finally, could you please provide your <strong>Email Address</strong>?`, 'quote-step');
+        break;
+      }
+
+      case 3: { // Step 3: Capture Email
+        const trimmedEmail = text.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(trimmedEmail)) {
+          this.addBot(`Please provide a valid <strong>Email Address</strong> (e.g., name@example.com).`, 'quote-step');
+          return;
+        }
+        this.leadData.email = trimmedEmail;
+
         // If product already known from memory/intent, skip selection
         if (this.leadData.product) {
           this.pendingProducts = [this.leadData.product];
           this.moveToNextProductSelection();
         } else {
-          this.currentStep = 3; // Move to Product Selection
+          this.currentStep = 4; // Move to Product Selection
           this.addBot(`Got it! Now, what product(s) would you like to print?`, 'quote-step');
           this.addChecklist([
             'Sun pack printing', 'Flex', 'ID cards', 'Flyer A5 SS', 'Flyer A5 FB', 'Flyer A4 SS', 'Flyer A4 FB',
@@ -1005,18 +1020,53 @@ class Chatbot {
         break;
       }
 
-      case 3: { // Step 3: Capture Product Selection
+      case 4: { // Step 4: Capture Product Selection
         this.leadData.selections = {};
-        if (text.includes(',')) {
-          this.pendingProducts = text.split(',').map(p => p.trim());
-        } else {
-          this.pendingProducts = [text.trim()];
-        }
+
+        // Helper to map user text to canonical product key
+        const mapToCanonical = (input: string): string => {
+          const lw = input.toLowerCase().trim();
+          const productMap: Record<string, string[]> = {
+            "sun pack printing": ['sun pack', 'sunpack', 'sunpack printing', 'advertisement board'],
+            "flex": ['flex', 'banner', 'hoarding', 'vinyl', 'backlit', 'sunpack', 'star flex'],
+            "id cards": ['id card', 'pvc card', 'identity card', 'idcard'],
+            "flyer a5 ss": ['flyer a5 ss', 'a5 flyer ss', 'a5 flyer single', 'a5 flyer single side'],
+            "flyer a5 fb": ['flyer a5 fb', 'a5 flyer fb', 'a5 flyer back', 'a5 flyer front and back'],
+            "flyer a4 ss": ['flyer a4 ss', 'a4 flyer ss', 'a4 flyer single', 'a4 flyer single side'],
+            "flyer a4 fb": ['flyer a4 fb', 'a4 flyer fb', 'a4 flyer back', 'a4 flyer front and back'],
+            "flyer a3 ss": ['flyer a3 ss', 'a3 flyer ss', 'a3 flyer single', 'a3 flyer single side'],
+            "flyer a3 fb": ['flyer a3 fb', 'a3 flyer fb', 'a3 flyer back', 'a3 flyer front and back'],
+            "multi colour certificate": ['certificate', 'award'],
+            "multi colour envelopes": ['multi colour envelopes', 'multi color envelope', 'multicolour envelope', 'multi colour envelope'],
+            "double colour envelopes": ['double colour envelopes', 'double color envelope', 'double colour envelope'],
+            "single colour envelopes": ['single colour envelopes', 'single color envelope', 'single colour envelope'],
+            "synopsis binding": ['synopsis', 'synopsis binding', 'tape binding'],
+            "multi colour letter head": ['multi colour letterhead', 'multi color letterhead', 'multi colour letter head'],
+            "double colour letter head": ['double colour letterhead', 'double color letterhead', 'double colour letter head', 'double colour letter'],
+            "single colour letter head": ['single colour letterhead', 'single color letterhead', 'single colour letter head'],
+            "thesis": ['thesis', 'dissertation', 'project report', 'thesis binding'],
+            "cd": ['cd', 'dvd', 'cd writing', 'cd sticker'],
+            "prescription pad": ['prescription', 'prescription pad', 'doctor pad', 'medical pad'],
+            "lamination": ['lamination', 'laminate', 'laminating', 'id lamination', 'sheet lamination'],
+            "binding": ['binding', 'spiral binding', 'hard binding', 'soft binding', 'project binding', 'comb binding'],
+            "doctor file - plastic": ['doctor file', 'plastic file', 'medical file', 'file printing'],
+            "business cards": ['business card', 'visiting card', 'name card', 'offset visiting', 'offset card', 'visiting card rate', 'card rate', 'card price', 'vc rate'],
+            "offset visiting card": ['offset visiting card']
+          };
+          for (const [canonical, aliases] of Object.entries(productMap)) {
+            if (aliases.some(alias => lw.includes(alias))) return canonical;
+          }
+          return input.trim(); // fallback to what they typed if no match
+        };
+
+        const rawProducts = text.includes(',') ? text.split(',') : [text];
+        this.pendingProducts = rawProducts.map(mapToCanonical);
+
         this.moveToNextProductSelection();
         break;
       }
 
-      case 4: { // Step 4: Capture Product Specs/Pricing
+      case 5: { // Step 5: Capture Product Specs/Pricing
         const currentProduct = this.pendingProducts[0];
         if (currentProduct && this.leadData.selections) {
           this.leadData.selections[currentProduct] = text;
@@ -1039,7 +1089,7 @@ class Chatbot {
     const productDesc = KB.products[lwProduct as keyof typeof KB.products];
     const pricingOpts = PRODUCT_PRICING_OPTIONS[lwProduct];
 
-    this.currentStep = 4; // Capture specs/pricing
+    this.currentStep = 5; // Capture specs/pricing
 
     if (productDesc) {
       this.addBot(`📊 <strong>Rate Card: ${p}</strong><br><br>${productDesc}`, 'product-detail');
@@ -1079,9 +1129,10 @@ class Chatbot {
               </div>
             `).join('')}
             
-            <div style="display: grid; grid-template-columns: 85px 1fr; gap: 4px; margin-top: 8px; border-top: 1px solid #f1f5f9; pt-4;">
+            <div style="display: grid; grid-template-columns: 85px 1fr; gap: 4px; margin-top: 8px; border-top: 1px solid #f1f5f9; padding-top: 16px;">
               <span style="color: #64748b;">Customer:</span><span style="font-weight: 600;">${this.leadData.name}</span>
               <span style="color: #64748b;">Phone:</span><span style="font-weight: 600;">${this.leadData.phone}</span>
+              <span style="color: #64748b;">Email:</span><span style="font-weight: 600; word-break: break-all;">${this.leadData.email}</span>
             </div>
           </div>
         </div>
@@ -1103,7 +1154,8 @@ class Chatbot {
       `Enquiry Items:\n` +
       Object.entries(this.leadData.selections || {}).map(([p, s]) => `• ${p}: ${s}`).join('\n') +
       `\n\nName: ${this.leadData.name}\n` +
-      `Phone: ${this.leadData.phone}`;
+      `Phone: ${this.leadData.phone}\n` +
+      `Email: ${this.leadData.email}`;
 
     this.addBot(
       `<a href="https://wa.me/${KB.company.whatsapp}?text=${encodeURIComponent(waText)}" target="_blank" class="cta-button" style="display:inline-block; margin-top:10px; text-decoration:none;">💬 Follow up on WhatsApp →</a>`,
@@ -1126,6 +1178,7 @@ class Chatbot {
       `CUSTOMER DETAILS:`,
       `Name   : ${this.leadData.name}`,
       `Phone  : ${this.leadData.phone}`,
+      `Email  : ${this.leadData.email}`,
       `------------------------------------------`,
       `ENQUIRY DETAILS:`,
       ...Object.entries(this.leadData.selections || {}).map(([p, s]) => ` - ${p}: ${s}`),
@@ -1144,6 +1197,7 @@ class Chatbot {
       // Metadata for FormSubmit dashboard filtering
       Customer_Name: this.leadData.name,
       Customer_Phone: this.leadData.phone,
+      Customer_Email: this.leadData.email,
       Product: this.leadData.product,
       _template: 'table'
     };
