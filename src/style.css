@@ -568,16 +568,31 @@ nav ul li a:hover {
 
 
 /* ── Checklist ───────────────────────────────────────────────────── */
+.checklist-category {
+  font-size: 0.8rem;
+  color: #0c2a4a;
+  margin-top: 10px;
+  margin-bottom: 6px;
+  padding-bottom: 4px;
+  border-bottom: 1px dashed #dfe4fd;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.checklist-category:first-child {
+  margin-top: 0;
+}
+
 .checklist-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   margin-top: 5px;
   margin-bottom: 12px;
   background: #ffffff;
   border: 1.5px solid #dfe4fd;
   border-radius: 12px;
-  padding: 12px 14px;
+  padding: 14px 16px;
   align-self: flex-start;
   max-width: 90%;
   box-shadow: 0 1px 4px rgba(1, 26, 65, 0.06);
@@ -593,11 +608,28 @@ nav ul li a:hover {
   user-select: none;
 }
 
+.checklist-item.hidden-checkbox {
+  padding-left: 0;
+  cursor: default;
+}
+
+.checklist-item.hidden-checkbox::before {
+  content: "•";
+  color: #C1282E;
+  font-size: 1.2rem;
+  line-height: 0.8;
+  margin-right: 2px;
+}
+
 .checklist-item input[type="checkbox"] {
   accent-color: #C1282E;
   width: 16px;
   height: 16px;
   cursor: pointer;
+}
+
+.checklist-item.hidden-checkbox input[type="checkbox"] {
+  display: none;
 }
 
 .checklist-submit {

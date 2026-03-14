@@ -250,6 +250,15 @@ const PRODUCT_PRICING_OPTIONS: Record<string, string[]> = {
 };
 
 
+const PRODUCT_CATEGORIES = [
+  { category: 'Signage & Display', items: ['sun pack printing', 'flex'] },
+  { category: 'Cards & IDs', items: ['business cards', 'offset visiting card', 'id cards'] },
+  { category: 'Flyers', items: ['flyer a5 ss', 'flyer a5 fb', 'flyer a4 ss', 'flyer a4 fb', 'flyer a3 ss', 'flyer a3 fb'] },
+  { category: 'Stationery', items: ['multi colour letter head', 'double colour letter head', 'single colour letter head', 'multi colour envelopes', 'double colour envelopes', 'single colour envelopes', 'multi colour certificate'] },
+  { category: 'Medical & Files', items: ['prescription pad', 'doctor file - plastic'] },
+  { category: 'Binding & Finishing', items: ['binding', 'synopsis binding', 'thesis', 'lamination', 'cd'] }
+];
+
 // Types
 // ─────────────────────────────────────────────────────────────────────────────
 interface ConversationEntry {
@@ -327,6 +336,7 @@ class Chatbot {
   private currentStep: number = 0;
   private isProcessing: boolean = false;
   private pendingProducts: string[] = [];
+  private scrollLock: boolean = false;
 
   constructor() {
     this.messagesContainer = document.getElementById('chat-messages')!;
@@ -379,12 +389,26 @@ class Chatbot {
   }
 
   // ── Rendering ──────────────────────────────────────────────────────────────
+  private smartScroll(el: HTMLElement) {
+    if (this.scrollLock) return;
+
+    const container = this.messagesContainer;
+    const isTall = el.offsetHeight > container.offsetHeight * 0.7;
+
+    if (isTall) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      this.scrollLock = true; // Lock the view to the top of this tall message
+    } else {
+      container.scrollTo({ top: container.scrollHeight, behavior: 'smooth' });
+    }
+  }
+
   private addBot(html: string, intent: string = '') {
     const div = document.createElement('div');
     div.className = 'message bot';
     div.innerHTML = html;
     this.messagesContainer.appendChild(div);
-    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    this.smartScroll(div);
     // Strip HTML for history storage
     const plain = html.replace(/<[^>]*>/g, '');
     this.recordHistory('bot', plain, intent);
@@ -395,7 +419,7 @@ class Chatbot {
     div.className = 'message user';
     div.innerHTML = text;
     this.messagesContainer.appendChild(div);
-    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    this.smartScroll(div);
     this.recordHistory('user', text, intent);
   }
 
@@ -408,33 +432,42 @@ class Chatbot {
       btn.textContent = opt;
       btn.addEventListener('click', () => {
         container.remove();
+        this.scrollLock = false; // Reset lock on button click
         this.addUser(opt, 'quick-reply');
         this.processResponse(opt);
       });
       container.appendChild(btn);
     });
     this.messagesContainer.appendChild(container);
-    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    this.smartScroll(container);
   }
 
-  private addChecklist(options: string[], buttonText: string, onsubmit: (selected: string[]) => void) {
+  private addChecklist(groups: { category: string, items: string[], hideCheckbox?: boolean }[], buttonText: string, onsubmit: (selected: string[]) => void) {
     const container = document.createElement('div');
     container.className = 'checklist-container';
 
     const checkboxes: HTMLInputElement[] = [];
 
-    options.forEach(opt => {
-      const label = document.createElement('label');
-      label.className = 'checklist-item';
+    groups.forEach(group => {
+      const categoryLabel = document.createElement('div');
+      categoryLabel.className = 'checklist-category';
+      categoryLabel.innerHTML = `<strong>${group.category}</strong>`;
+      container.appendChild(categoryLabel);
 
-      const cb = document.createElement('input');
-      cb.type = 'checkbox';
-      cb.value = opt;
-      checkboxes.push(cb);
+      group.items.forEach(opt => {
+        const label = document.createElement('label');
+        label.className = `checklist-item${group.hideCheckbox ? ' hidden-checkbox' : ''}`;
 
-      label.appendChild(cb);
-      label.appendChild(document.createTextNode(opt));
-      container.appendChild(label);
+        const cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.value = opt;
+        checkboxes.push(cb);
+
+        label.appendChild(cb);
+        const displayName = group.hideCheckbox ? opt.charAt(0).toUpperCase() + opt.slice(1) : opt;
+        label.appendChild(document.createTextNode(displayName));
+        container.appendChild(label);
+      });
     });
 
     const btn = document.createElement('button');
@@ -451,7 +484,7 @@ class Chatbot {
 
     container.appendChild(btn);
     this.messagesContainer.appendChild(container);
-    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    this.smartScroll(container);
   }
 
   /** Show selectable pricing option buttons. On click, captures selection as quantity+spec and jumps to deadline step. */
@@ -477,7 +510,7 @@ class Chatbot {
     });
 
     this.messagesContainer.appendChild(container);
-    this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    this.smartScroll(container);
   }
 
   private addTyping(): Promise<void> {
@@ -487,7 +520,7 @@ class Chatbot {
       el.innerHTML = '<span></span><span></span><span></span>';
       el.id = 'typing-indicator';
       this.messagesContainer.appendChild(el);
-      this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+      this.smartScroll(el);
       setTimeout(() => { el.remove(); resolve(); }, 700);
     });
   }
@@ -508,6 +541,7 @@ class Chatbot {
   private handleSendMessage() {
     const text = this.input.value.trim();
     if (!text || this.isProcessing) return;
+    this.scrollLock = false; // Reset lock on user action
     this.addUser(text, 'user-input');
     this.input.value = '';
     document.querySelectorAll('.quick-replies').forEach(el => el.remove());
@@ -519,6 +553,7 @@ class Chatbot {
   // ─────────────────────────────────────────────────────────────────────────────
   private async processResponse(text: string) {
     this.isProcessing = true;
+    this.scrollLock = false; // Reset lock when starting a new bot sequence
     await this.addTyping();
 
     const lw = text.toLowerCase();
@@ -655,16 +690,28 @@ class Chatbot {
 
     // ── Products list ─────────────────────────────────────────────────────────
     if (matchesAny(lw, ['product', 'items', 'catalogue', 'catalog', 'what can you print', 'what do you print', 'what types', 'print what'])) {
-      const list = Object.keys(KB.products).map((p, i) => `${i + 1}. ${p.charAt(0).toUpperCase() + p.slice(1)}`).join('<br>');
-      this.addBot(`📦 <strong>Our Products</strong><br><br>We print a wide range of items:<br><br>${list}`, 'products');
-      this.addBot(this.memory.name
-        ? `Which one interests you, <strong>${this.memory.name}</strong>? I can give you full details and arrange a quote.`
-        : `Which product would you like to know more about? I can provide full details and a quotation.`, 'products');
-      this.memory.lastTopic = 'products';
-      this.addQuickReplies(['🃏 Business Cards', '📚 Books', '📄 Brochures', '📅 Calendars', '� Synopsis Binding', '📋 Get a Quote']);
+      this.addBot(`📦 <strong>Our Product Categories</strong><br>We offer high-quality printing across many categories. Select one to see our products:`, 'products');
+      const categoryNames = PRODUCT_CATEGORIES.map(c => c.category);
+      this.addQuickReplies(categoryNames);
+      this.memory.lastTopic = 'product-categories';
       this.isProcessing = false;
       return;
     }
+
+    // ── Category selection handler ─────────────────────────────────────────────
+    const matchedCategory = PRODUCT_CATEGORIES.find(c => lw === c.category.toLowerCase());
+    if (matchedCategory) {
+      const itemsList = matchedCategory.items.map(p => `• ${p.charAt(0).toUpperCase() + p.slice(1)}`).join('<br>');
+      const promptText = this.memory.name
+        ? `Which one interests you, <strong>${this.memory.name}</strong>? I can give you full details and arrange a quote.`
+        : `Which product would you like to know more about? I can provide full details and a quotation.`;
+
+      this.addBot(`📁 <strong>${matchedCategory.category}</strong><br><br>${itemsList}<br><br>${promptText}`, 'category-detail');
+      this.memory.lastTopic = 'category-detail';
+      this.isProcessing = false;
+      return;
+    }
+
 
     // ── Individual product lookup ─────────────────────────────────────────────
     const productMap: Record<string, string[]> = {
@@ -1005,64 +1052,60 @@ class Chatbot {
           this.pendingProducts = [this.leadData.product];
           this.moveToNextProductSelection();
         } else {
-          this.currentStep = 4; // Move to Product Selection
-          this.addBot(`Got it! Now, what product(s) would you like to print?`, 'quote-step');
-          this.addChecklist([
-            'Sun pack printing', 'Flex', 'ID cards', 'Flyer A5 SS', 'Flyer A5 FB', 'Flyer A4 SS', 'Flyer A4 FB',
-            'Flyer A3 SS', 'Flyer A3 FB', 'Multi colour certificate', 'Multi colour envelopes', 'Double colour envelopes',
-            'Single Colour envelopes', 'Synopsis binding', 'Multi colour letter head', 'Double colour letter head',
-            'Single Colour Letter head', 'Thesis', 'CD', 'Prescription pad', 'Lamination', 'Doctor file - plastic',
-            'Binding', 'Business cards', 'Offset visiting card'
-          ], 'Confirm Products', (selected) => {
-            this.handleQuoteFlow(selected.join(', '));
-          });
+          this.currentStep = 4; // Move to Category Selection
+          this.pendingProducts = []; // Clear any old data
+          this.addBot(`Got it! Now, which <strong>Category</strong> does your product belong to?`, 'quote-step');
+          const categoryNames = PRODUCT_CATEGORIES.map(c => c.category);
+          this.addQuickReplies(categoryNames);
         }
         break;
       }
 
-      case 4: { // Step 4: Capture Product Selection
-        this.leadData.selections = {};
+      case 4: { // Step 4: Category / Product selection (loopable)
+        const lwText = text.toLowerCase();
+        const category = PRODUCT_CATEGORIES.find(c => c.category.toLowerCase() === lwText);
 
-        // Helper to map user text to canonical product key
-        const mapToCanonical = (input: string): string => {
-          const lw = input.toLowerCase().trim();
-          const productMap: Record<string, string[]> = {
-            "sun pack printing": ['sun pack', 'sunpack', 'sunpack printing', 'advertisement board'],
-            "flex": ['flex', 'banner', 'hoarding', 'vinyl', 'backlit', 'sunpack', 'star flex'],
-            "id cards": ['id card', 'pvc card', 'identity card', 'idcard'],
-            "flyer a5 ss": ['flyer a5 ss', 'a5 flyer ss', 'a5 flyer single', 'a5 flyer single side'],
-            "flyer a5 fb": ['flyer a5 fb', 'a5 flyer fb', 'a5 flyer back', 'a5 flyer front and back'],
-            "flyer a4 ss": ['flyer a4 ss', 'a4 flyer ss', 'a4 flyer single', 'a4 flyer single side'],
-            "flyer a4 fb": ['flyer a4 fb', 'a4 flyer fb', 'a4 flyer back', 'a4 flyer front and back'],
-            "flyer a3 ss": ['flyer a3 ss', 'a3 flyer ss', 'a3 flyer single', 'a3 flyer single side'],
-            "flyer a3 fb": ['flyer a3 fb', 'a3 flyer fb', 'a3 flyer back', 'a3 flyer front and back'],
-            "multi colour certificate": ['certificate', 'award'],
-            "multi colour envelopes": ['multi colour envelopes', 'multi color envelope', 'multicolour envelope', 'multi colour envelope'],
-            "double colour envelopes": ['double colour envelopes', 'double color envelope', 'double colour envelope'],
-            "single colour envelopes": ['single colour envelopes', 'single color envelope', 'single colour envelope'],
-            "synopsis binding": ['synopsis', 'synopsis binding', 'tape binding'],
-            "multi colour letter head": ['multi colour letterhead', 'multi color letterhead', 'multi colour letter head'],
-            "double colour letter head": ['double colour letterhead', 'double color letterhead', 'double colour letter head', 'double colour letter'],
-            "single colour letter head": ['single colour letterhead', 'single color letterhead', 'single colour letter head'],
-            "thesis": ['thesis', 'dissertation', 'project report', 'thesis binding'],
-            "cd": ['cd', 'dvd', 'cd writing', 'cd sticker'],
-            "prescription pad": ['prescription', 'prescription pad', 'doctor pad', 'medical pad'],
-            "lamination": ['lamination', 'laminate', 'laminating', 'id lamination', 'sheet lamination'],
-            "binding": ['binding', 'spiral binding', 'hard binding', 'soft binding', 'project binding', 'comb binding'],
-            "doctor file - plastic": ['doctor file', 'plastic file', 'medical file', 'file printing'],
-            "business cards": ['business card', 'visiting card', 'name card', 'offset visiting', 'offset card', 'visiting card rate', 'card rate', 'card price', 'vc rate'],
-            "offset visiting card": ['offset visiting card']
-          };
-          for (const [canonical, aliases] of Object.entries(productMap)) {
-            if (aliases.some(alias => lw.includes(alias))) return canonical;
+        if (category) {
+          // Show products for this category
+          this.addBot(`Select the <strong>${category.category}</strong> products you need:`, 'quote-step');
+          this.addChecklist([{ category: category.category, items: category.items, hideCheckbox: false }], 'Confirm Selection', (selected) => {
+            this.handleQuoteFlow(selected.join(', '));
+          });
+          return;
+        }
+
+        // If text contains items (from checklist confirm)
+        if (text.includes(',') || PRODUCT_CATEGORIES.some(cat => cat.items.some(item => lwText.includes(item.toLowerCase())))) {
+          const items = text.split(',').map(i => i.trim()).filter(i => i);
+          this.pendingProducts.push(...items);
+
+          this.addBot(`Got it! I've added those. Would you like to select more products from another category or proceed with these?`, 'quote-step');
+          this.addQuickReplies(['➕ Select More', '✅ Proceed to Details']);
+          return;
+        }
+
+        if (lwText === 'select more' || lwText === '➕ select more') {
+          this.addBot(`Sure! Select another category:`, 'quote-step');
+          const categoryNames = PRODUCT_CATEGORIES.map(c => c.category);
+          this.addQuickReplies(categoryNames);
+          return;
+        }
+
+        if (lwText === 'proceed to details' || lwText === '✅ proceed to details') {
+          if (this.pendingProducts.length === 0) {
+            this.addBot(`You haven't selected any products yet! Please pick a category:`, 'quote-step');
+            const categoryNames = PRODUCT_CATEGORIES.map(c => c.category);
+            this.addQuickReplies(categoryNames);
+            return;
           }
-          return input.trim(); // fallback to what they typed if no match
-        };
+          this.moveToNextProductSelection();
+          return;
+        }
 
-        const rawProducts = text.includes(',') ? text.split(',') : [text];
-        this.pendingProducts = rawProducts.map(mapToCanonical);
-
-        this.moveToNextProductSelection();
+        // Fallback if they type something else
+        this.addBot(`Please select a category from the buttons below or click Proceed:`, 'quote-step');
+        const categoryNames = PRODUCT_CATEGORIES.map(c => c.category);
+        this.addQuickReplies([...categoryNames, '✅ Proceed to Details']);
         break;
       }
 
@@ -1084,6 +1127,7 @@ class Chatbot {
   }
 
   private moveToNextProductSelection() {
+    if (!this.leadData.selections) this.leadData.selections = {};
     const p = this.pendingProducts[0];
     const lwProduct = p.toLowerCase();
     const productDesc = KB.products[lwProduct as keyof typeof KB.products];
