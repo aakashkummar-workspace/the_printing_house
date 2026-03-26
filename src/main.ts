@@ -1258,6 +1258,22 @@ class Chatbot {
       .then(data => console.log('Email sent successfully:', data))
       .catch(error => console.error('Email send failed:', error));
 
+    // Save lead to database
+    fetch('/api/leads', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: this.leadData.name,
+        phone: this.leadData.phone,
+        email: this.leadData.email,
+        products: this.leadData.product || Object.keys(this.leadData.selections || {}).join(', ') || '',
+        selections: this.leadData.selections || {}
+      })
+    })
+      .then(r => r.json())
+      .then(d => console.log('Lead saved to DB:', d))
+      .catch(e => console.error('Lead save failed:', e));
+
     this.currentStep = 0;
     this.leadData = {};
     this.memory.lastTopic = 'quote-done';

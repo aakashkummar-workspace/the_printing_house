@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin - Leads Dashboard | The Printing House</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f4f6f9;
+      color: #011A41;
+      min-height: 100vh;
+    }
+
+    /* Header — matches chatbot header #0C2A4A */
+    .admin-header {
+      background: #0C2A4A;
+      padding: 16px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 12px rgba(12, 42, 74, 0.3);
+    }
+
+    .admin-header .logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-decoration: none;
+    }
+
+    .admin-header .logo span { color: #C1282E; }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+
+    .btn {
+      padding: 8px 18px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      text-decoration: none;
+    }
+
+    .btn-primary {
+      background: #C1282E;
+      color: white;
+    }
+
+    .btn-primary:hover { background: #a82025; }
+
+    .btn-header {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #ffffff;
+    }
+
+    .btn-header:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+
+    .btn-outline {
+      background: #ffffff;
+      border: 1px solid #e0e4ea;
+      color: #0C2A4A;
+    }
+
+    .btn-outline:hover {
+      border-color: #0C2A4A;
+      background: #f4f6f9;
+    }
+
+    .btn-danger {
+      background: #C1282E;
+      color: white;
+    }
+
+    .btn-danger:hover { background: #a82025; }
+
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 0.75rem;
+    }
+
+    /* Stats Cards */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      padding: 24px 32px;
+    }
+
+    .stat-card {
+      background: #ffffff;
+      border: 1px solid #e0e4ea;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 1px 4px rgba(12, 42, 74, 0.06);
+      transition: all 0.2s;
+    }
+
+    .stat-card:hover {
+      border-color: #0C2A4A;
+      box-shadow: 0 4px 12px rgba(12, 42, 74, 0.12);
+      transform: translateY(-2px);
+    }
+
+    .stat-card .label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #6b7a8d;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .stat-card .value {
+      font-size: 1.75rem;
+      font-weight: 800;
+      color: #011A41;
+    }
+
+    .stat-card .value.navy { color: #0C2A4A; }
+    .stat-card .value.green { color: #22c55e; }
+    .stat-card .value.red { color: #C1282E; }
+
+    /* Main Content */
+    .main-content {
+      padding: 0 32px 32px;
+    }
+
+    .toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .toolbar h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #0C2A4A;
+    }
+
+    .search-box {
+      background: #ffffff;
+      border: 1px solid #e0e4ea;
+      border-radius: 10px;
+      padding: 10px 14px;
+      color: #011A41;
+      font-size: 0.85rem;
+      width: 280px;
+      outline: none;
+      transition: border-color 0.2s;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .search-box::placeholder { color: #aab0bd; }
+    .search-box:focus { border-color: #0C2A4A; background: #ffffff; }
+
+    /* Table */
+    .table-wrapper {
+      background: #ffffff;
+      border: 1px solid #e0e4ea;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 1px 4px rgba(12, 42, 74, 0.06);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background: #0C2A4A;
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: rgba(255, 255, 255, 0.8);
+      border-bottom: none;
+      white-space: nowrap;
+    }
+
+    tbody td {
+      padding: 14px 16px;
+      font-size: 0.85rem;
+      border-bottom: 1px solid #f0f2f5;
+      color: #334155;
+      vertical-align: top;
+    }
+
+    tbody tr {
+      transition: background 0.15s;
+    }
+
+    tbody tr:hover { background: #f8fafc; }
+
+    tbody tr:last-child td { border-bottom: none; }
+
+    .ref-badge {
+      background: #0C2A4A;
+      color: white;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    .customer-name {
+      font-weight: 700;
+      color: #011A41;
+    }
+
+    .customer-detail {
+      font-size: 0.75rem;
+      color: #6b7a8d;
+      margin-top: 2px;
+    }
+
+    .product-tag {
+      display: inline-block;
+      background: #fef2f2;
+      color: #C1282E;
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin: 2px 2px;
+      text-transform: capitalize;
+      border: 1px solid #fecaca;
+    }
+
+    .selections-list {
+      font-size: 0.75rem;
+      color: #475569;
+      line-height: 1.5;
+    }
+
+    .date-cell {
+      white-space: nowrap;
+      font-size: 0.8rem;
+      color: #011A41;
+    }
+
+    .date-cell .time {
+      color: #6b7a8d;
+      font-size: 0.7rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #6b7a8d;
+    }
+
+    .empty-state svg {
+      margin-bottom: 16px;
+      opacity: 0.4;
+    }
+
+    .empty-state p {
+      font-size: 0.9rem;
+    }
+
+    /* Loading */
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6b7a8d;
+    }
+
+    .loading .spinner {
+      display: inline-block;
+      width: 32px;
+      height: 32px;
+      border: 3px solid #e0e4ea;
+      border-top-color: #C1282E;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .admin-header, .stats-row, .main-content { padding-left: 16px; padding-right: 16px; }
+      .search-box { width: 100%; }
+      .table-wrapper { overflow-x: auto; }
+      table { min-width: 700px; }
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 42, 74, 0.5);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: #ffffff;
+      border: 1px solid #e0e4ea;
+      border-radius: 16px;
+      padding: 0;
+      max-width: 500px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px -10px rgba(12, 42, 74, 0.3);
+    }
+
+    .modal-header {
+      background: #0C2A4A;
+      padding: 18px 24px;
+      border-radius: 16px 16px 0 0;
+    }
+
+    .modal-header h3 {
+      font-size: 1.1rem;
+      color: #ffffff;
+      margin: 0;
+    }
+
+    .modal-body {
+      padding: 24px;
+    }
+
+    .modal-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f2f5;
+      font-size: 0.85rem;
+    }
+
+    .modal-row:last-child { border-bottom: none; }
+
+    .modal-row .label { color: #6b7a8d; font-weight: 500; }
+    .modal-row .value { color: #011A41; font-weight: 600; text-align: right; }
+
+    .modal-section-title {
+      margin-top: 16px;
+      font-weight: 700;
+      color: #0C2A4A;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #C1282E;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      padding: 16px 24px;
+      border-top: 1px solid #f0f2f5;
+    }
+
+    /* Refresh animation */
+    .btn.refreshing svg {
+      animation: spin 0.6s linear infinite;
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Header -->
+  <header class="admin-header">
+    <a href="/" class="logo">The <span>Printing</span> House — Admin</a>
+    <div class="header-actions">
+      <a href="/" class="btn btn-header">Back to Site</a>
+    </div>
+  </header>
+
+  <!-- Stats -->
+  <div class="stats-row">
+    <div class="stat-card" onclick="showStatPopup('total')" style="cursor:pointer;">
+      <div class="label">Total Leads</div>
+      <div class="value navy" id="stat-total">—</div>
+    </div>
+    <div class="stat-card" onclick="showStatPopup('today')" style="cursor:pointer;">
+      <div class="label">Today's Leads</div>
+      <div class="value green" id="stat-today">—</div>
+    </div>
+    <div class="stat-card" onclick="showStatPopup('week')" style="cursor:pointer;">
+      <div class="label">This Week</div>
+      <div class="value red" id="stat-week">—</div>
+    </div>
+  </div>
+
+  <!-- Leads Table -->
+  <div class="main-content">
+    <div class="toolbar">
+      <h2>All Enquiry Leads</h2>
+      <input type="text" class="search-box" id="search-input" placeholder="Search by name, phone, email, product...">
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Ref</th>
+            <th>Customer</th>
+            <th>Product</th>
+            <th>Selections</th>
+            <th>Date</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="leads-tbody">
+          <tr><td colspan="6" class="loading"><div class="spinner"></div><p style="margin-top:12px;">Loading leads...</p></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Detail Modal -->
+  <div class="modal-overlay" id="detail-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modal-title">Lead Details</h3>
+      </div>
+      <div class="modal-body" id="modal-body"></div>
+      <div class="modal-actions">
+        <button class="btn btn-outline" onclick="closeModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const API = '/api/leads';
+    let allLeads = [];
+
+    async function loadLeads() {
+      try {
+        const res = await fetch(API);
+        allLeads = await res.json();
+        renderLeads(allLeads);
+        updateStats(allLeads);
+      } catch (err) {
+        document.getElementById('leads-tbody').innerHTML =
+          '<tr><td colspan="6" class="empty-state"><p>Could not connect to server.<br>Make sure the backend is running on port 3001.</p></td></tr>';
+      }
+    }
+
+    function refreshPage() {
+      const btn = document.getElementById('refresh-btn');
+      btn.classList.add('refreshing');
+      document.getElementById('search-input').value = '';
+      loadLeads().finally(() => {
+        setTimeout(() => btn.classList.remove('refreshing'), 400);
+      });
+    }
+
+    function updateStats(leads) {
+      document.getElementById('stat-total').textContent = leads.length;
+
+      const today = new Date().toDateString();
+      const todayCount = leads.filter(l => new Date(l.created_at + 'Z').toDateString() === today).length;
+      document.getElementById('stat-today').textContent = todayCount;
+
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+      const weekCount = leads.filter(l => new Date(l.created_at + 'Z') >= weekAgo).length;
+      document.getElementById('stat-week').textContent = weekCount;
+    }
+
+    function renderLeads(leads) {
+      const tbody = document.getElementById('leads-tbody');
+
+      if (leads.length === 0) {
+        const q = document.getElementById('search-input').value;
+        const msg = q
+          ? 'No leads match "<strong>' + escHtml(q) + '</strong>".'
+          : 'No leads yet.<br>Leads will appear here once customers submit enquiries via the chatbot.';
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><svg width="48" height="48" fill="none" stroke="#6b7a8d" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 12h6m-3-3v6m-7 4h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg><p>' + msg + '</p></td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = leads.map(lead => {
+        const date = new Date(lead.created_at + 'Z');
+        const dateStr = date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        const timeStr = date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+
+        const selections = lead.selections || {};
+        const selHtml = Object.entries(selections).map(([k, v]) =>
+          '<div><strong>' + escHtml(k) + ':</strong> ' + escHtml(String(v)) + '</div>'
+        ).join('') || '<span style="color:#aab0bd;">—</span>';
+
+        return `<tr>
+          <td><span class="ref-badge">${escHtml(lead.ref_number)}</span></td>
+          <td>
+            <div class="customer-name">${escHtml(lead.name)}</div>
+            <div class="customer-detail">${escHtml(lead.phone)}</div>
+            <div class="customer-detail">${escHtml(lead.email)}</div>
+          </td>
+          <td><span class="product-tag">${escHtml(lead.products || '—')}</span></td>
+          <td><div class="selections-list">${selHtml}</div></td>
+          <td class="date-cell">${dateStr}<br><span class="time">${timeStr}</span></td>
+          <td>
+            <button class="btn btn-outline btn-sm" onclick="viewLead(${lead.id})">View</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteLead(${lead.id})" style="margin-top:4px;">Delete</button>
+          </td>
+        </tr>`;
+      }).join('');
+    }
+
+    function showStatPopup(type) {
+      let filtered = [];
+      let title = '';
+
+      const today = new Date().toDateString();
+      const weekAgo = new Date();
+      weekAgo.setDate(weekAgo.getDate() - 7);
+
+      if (type === 'total') {
+        filtered = allLeads;
+        title = 'All Leads (' + allLeads.length + ')';
+      } else if (type === 'today') {
+        filtered = allLeads.filter(l => new Date(l.created_at + 'Z').toDateString() === today);
+        title = "Today's Leads (" + filtered.length + ')';
+      } else if (type === 'week') {
+        filtered = allLeads.filter(l => new Date(l.created_at + 'Z') >= weekAgo);
+        title = 'This Week (' + filtered.length + ')';
+      }
+
+      let rows = '';
+      if (filtered.length === 0) {
+        rows = '<p style="text-align:center;color:#6b7a8d;padding:20px;">No leads found.</p>';
+      } else {
+        rows = filtered.map(l => {
+          const date = new Date(l.created_at + 'Z');
+          const dateStr = date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+          const timeStr = date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+          const products = Object.keys(l.selections || {}).join(', ') || l.products || '—';
+          return `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid #f0f2f5;">
+              <div style="flex:1;">
+                <div style="font-weight:700;color:#011A41;">${escHtml(l.name)}</div>
+                <div style="font-size:0.75rem;color:#6b7a8d;">${escHtml(l.phone)} &middot; ${escHtml(l.email)}</div>
+                <div style="font-size:0.75rem;color:#475569;margin-top:2px;">${escHtml(products)}</div>
+              </div>
+              <div style="text-align:right;flex-shrink:0;margin-left:16px;">
+                <span class="ref-badge">${escHtml(l.ref_number)}</span>
+                <div style="font-size:0.7rem;color:#6b7a8d;margin-top:4px;">${dateStr}, ${timeStr}</div>
+              </div>
+            </div>`;
+        }).join('');
+      }
+
+      document.getElementById('modal-title').textContent = title;
+      document.getElementById('modal-body').innerHTML = rows;
+      document.getElementById('detail-modal').classList.add('active');
+    }
+
+    function filterLeads() {
+      const q = document.getElementById('search-input').value.toLowerCase().trim();
+      if (!q) { renderLeads(allLeads); updateStats(allLeads); return; }
+      const filtered = allLeads.filter(l => {
+        const selText = Object.entries(l.selections || {}).map(([k, v]) => k + ' ' + v).join(' ').toLowerCase();
+        return (l.name || '').toLowerCase().includes(q) ||
+          (l.phone || '').toLowerCase().includes(q) ||
+          (l.email || '').toLowerCase().includes(q) ||
+          (l.ref_number || '').toLowerCase().includes(q) ||
+          (l.products || '').toLowerCase().includes(q) ||
+          selText.includes(q);
+      });
+      renderLeads(filtered);
+      updateStats(filtered);
+    }
+
+    function viewLead(id) {
+      const lead = allLeads.find(l => l.id === id);
+      if (!lead) return;
+
+      const date = new Date(lead.created_at + 'Z');
+      const dateStr = date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+
+      const selections = lead.selections || {};
+      const selRows = Object.entries(selections).map(([k, v]) =>
+        `<div class="modal-row"><span class="label">${escHtml(k)}</span><span class="value">${escHtml(String(v))}</span></div>`
+      ).join('');
+
+      document.getElementById('modal-title').textContent = 'Lead ' + lead.ref_number;
+      document.getElementById('modal-body').innerHTML = `
+        <div class="modal-row"><span class="label">Name</span><span class="value">${escHtml(lead.name)}</span></div>
+        <div class="modal-row"><span class="label">Phone</span><span class="value">${escHtml(lead.phone)}</span></div>
+        <div class="modal-row"><span class="label">Email</span><span class="value">${escHtml(lead.email)}</span></div>
+        <div class="modal-row"><span class="label">Product</span><span class="value">${escHtml(lead.products || '—')}</span></div>
+        ${selRows ? '<div class="modal-section-title">Selections</div>' + selRows : ''}
+        <div class="modal-row"><span class="label">Date</span><span class="value">${dateStr}</span></div>
+      `;
+      document.getElementById('detail-modal').classList.add('active');
+    }
+
+    function closeModal() {
+      document.getElementById('detail-modal').classList.remove('active');
+    }
+
+    async function deleteLead(id) {
+      if (!confirm('Are you sure you want to delete this lead?')) return;
+      try {
+        await fetch(API + '/' + id, { method: 'DELETE' });
+        loadLeads();
+      } catch (err) {
+        alert('Failed to delete lead.');
+      }
+    }
+
+    function escHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str || '';
+      return div.innerHTML;
+    }
+
+    // Close modal on overlay click
+    document.getElementById('detail-modal').addEventListener('click', function (e) {
+      if (e.target === this) closeModal();
+    });
+
+    // Search input event
+    document.getElementById('search-input').addEventListener('input', filterLeads);
+    document.getElementById('search-input').addEventListener('keyup', filterLeads);
+
+    // Initial load
+    loadLeads();
+  </script>
+</body>
+</html>
